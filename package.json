@@ -1,0 +1,41 @@
+{
+  "name": "file-uploader-project",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "studio": "npx prisma studio --config ./prisma.config.js",
+    "dev": "node --run start -- --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/heroes75/file-uploader-project.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/heroes75/file-uploader-project/issues"
+  },
+  "homepage": "https://github.com/heroes75/file-uploader-project#readme",
+  "dependencies": {
+    "@prisma/adapter-pg": "^7.3.0",
+    "@prisma/client": "^7.3.0",
+    "@quixo3/prisma-session-store": "^3.1.19",
+    "bcryptjs": "^3.0.3",
+    "dotenv": "^17.2.4",
+    "ejs": "^4.0.1",
+    "express": "^5.2.1",
+    "express-session": "^1.19.0",
+    "express-validator": "^7.3.1",
+    "multer": "^2.0.2",
+    "passport": "^0.7.0",
+    "passport-local": "^1.0.0",
+    "pg": "^8.18.0"
+  },
+  "devDependencies": {
+    "prisma": "^7.3.0"
+  }
+}
