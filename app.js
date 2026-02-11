@@ -11,7 +11,7 @@ const session = require('express-session')
 const { PrismaSessionStore } = require('@quixo3/prisma-session-store')
 const passport = require('passport')
 const logoutRouter = require('./routes/logout-router')
-const uploadRouter = require('./routes/upload-router')
+const uploadRouter = require('./routes/folders-router')
 
 
 const app = express()
