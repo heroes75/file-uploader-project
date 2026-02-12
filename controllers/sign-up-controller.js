@@ -1,6 +1,8 @@
 const { body, matchedData, validationResult} = require('express-validator')
 const bcrypt = require('bcryptjs')
 const prisma = require('../lib/prisma')
+const fs = require('node:fs')
+const path = require('node:path')
 
 const isNotEmpty = ' must not be empty'
 
@@ -38,10 +40,20 @@ exports.signUpController = [
             data: {
                 username,
                 password: hash
+            },
+        })
+        const destination = `../../../uploaded-file/${userCreate.username}`
+        fs.mkdirSync(path.join(__dirname, destination))
+        const createFirstFolder = await prisma.folder.create({
+            data : {
+                userId : userCreate.id,
+                folderUrl: '/dashboard/' + userCreate.username,
+                destination: destination,
+                name: `${userCreate.username}`
             }
         })
         console.log('userCreate:', userCreate)
-
+        console.log('createFirstFolder:', createFirstFolder)
         res.redirect('/')
     }
 

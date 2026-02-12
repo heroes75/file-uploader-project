@@ -1,5 +1,5 @@
 const {Router} = require('express')
-const { displayDashboard, uploadFile } = require('../controllers/folders-controller')
+const { displayDashboard, uploadFile, createFolder } = require('../controllers/folders-controller')
 const uploadRouter = Router()
 const fs = require('fs')
 const path = require('node:path')
@@ -8,7 +8,9 @@ const path = require('node:path')
 const multer = require("multer");
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        if(!fs.existsSync(`../../../uploaded-file/${req.user.username}`)) {
+        const folderExists = fs.existsSync(path.join(__dirname,  `../../../uploaded-file/${req.user.username}`))
+        console.log('folderExists:', folderExists)
+        if(!folderExists) {
             fs.mkdirSync(path.join(__dirname,  `../../../uploaded-file/${req.user.username}`), err => {
                 if(err) return console.error(err)
                 console.log('Directory created successfully!');
@@ -25,9 +27,12 @@ const storage = multer.diskStorage({
 const upload = multer({storage: storage});
 
 
-uploadRouter.get('/',  displayDashboard)
+uploadRouter.get('/:id',  displayDashboard)
 // must add uploadFile function
 uploadRouter.post('/upload', upload.single('fileBackup'), uploadFile)
-uploadRouter.get('/create',  (req, res) => { res.render('createFolder')})
+uploadRouter.get('/:id/create',  (req, res) => { res.render('createFolder')})
+uploadRouter.post('/:id/create',  createFolder)
+// uploadRouter.get(/(?:\/:id){2,}/,  createFolder)
+uploadRouter.get(/(?:\/.+){2,}\/:id/,  createFolder)
 
 module.exports = uploadRouter

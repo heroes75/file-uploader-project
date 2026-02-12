@@ -1,0 +1,5 @@
+<% if (locals.folders) { %>
+    <% folders.forEach(folder => { %>
+     <a style="display: block; margin: 25px; font-size: 20px;" href="<%- folder.folderUrl %>"><%- folder.name %></a>
+    <% }) %>
+<% } %>

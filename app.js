@@ -24,7 +24,7 @@ app.use(session({
     resave: false,
     saveUninitialized: true,
     cookie: {
-        maxAge: 1000 * 60 * 60
+        maxAge: 1000 * 60 * 60 * 24 * 7
     },
     store: new PrismaSessionStore(
         prisma,
@@ -51,7 +51,7 @@ app.use('/login', loginRouter)
 app.use('/logout', logoutRouter)
 app.use('/dashboard', uploadRouter)
 
-app.listen(3000, (err) => {
+app.listen(8888, (err) => {
     if (err) {
         console.error(err)
     }
@@ -72,6 +72,6 @@ app.listen(3000, (err) => {
     //     console.error( e)
     //     await prisma.$disconnect()
     // }) 
-    console.log('listen at port http://localhost:3000')
+    console.log('listen at port http://localhost:8888')
     
 })

@@ -1,29 +1,54 @@
-// const multer = require("multer");
-// const storage = multer.diskStorage({
-//     destination: function (req, file, cb) {
-//         cb(null, `/home/emmanuel75/uploaded-file/${req.user.username}`);
-//     },
-//     filename: function (req, file, cb) {
-//         const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-//         cb(null, file.fieldname + "-" + uniqueSuffix);
-//     },
-// });
+const fs = require("node:fs");
+const prisma = require("../lib/prisma");
 
-// const upload = multer({storage: storage});
-
-function displayDashboard(req, res) {
-    res.render("dashboard");
+async function displayDashboard(req, res) {
+    const folders = await  prisma.folder.findFirst({
+        where: {
+            destination: `../../../uploaded-file/${req.user.username}`
+        },
+        include: {
+            folders: true
+        }
+    })
+    console.log('folders:', folders)
+    res.render("dashboard", {folders: folders.folders});
 }
 
 function uploadFile(req, res) {
-    // upload.single('fileBackup')
-    // console.log('upload:', upload)
-    res.redirect('/dashboard')
+    res.redirect("/dashboard/" + req.user.username);
 }
 
+async function createFolder(req, res, next) {
+    console.log("req.url:", req.originalUrl);
+    const url = req.originalUrl.replace("/create", "")
+    const parentFolder = await prisma.folder.findFirst({
+        where: {
+            folderUrl: url,
+        },
+    });
+    console.log("parentFolder:", parentFolder);
+    const { folderName } = req.body;
+    const createFolder = await prisma.folder.create({
+        data: {
+            userId: +req.user.id,
+            name: folderName,
+            parentId: parentFolder.destination,
+            destination: parentFolder.destination + "/" + folderName,
+            folderUrl: parentFolder.folderUrl + "/" + folderName,
+        },
+    });
+    console.log('createFolder:', createFolder)
+    res.redirect(url)
+    next();
+}
 
+async function displayFolder(req, res) {
+    res.render('displayFolder')
+}
 
 module.exports = {
     displayDashboard,
-    uploadFile
+    uploadFile,
+    createFolder,
+    displayFolder
 };
