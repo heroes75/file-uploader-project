@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Create a sub folder</title>
 </head>
 <body>
-    <form action="/dashboard/<%= currentUser.username %>/create" method="post">
+    <form action="<%= locals.folderUrl %>/create" method="post">
         <label for="folderName"> Enter your folder name</label>
         <input type="text" name="folderName" id="folderName" required>
         <button type="submit">Submit</button>

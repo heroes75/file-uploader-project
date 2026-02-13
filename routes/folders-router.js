@@ -1,5 +1,5 @@
 const {Router} = require('express')
-const { displayDashboard, uploadFile, createFolder } = require('../controllers/folders-controller')
+const { displayDashboard, uploadFile, createFolder, displayFolder, displayCreateFolderPage, displayUpdateFolderPage, updateFolder } = require('../controllers/folders-controller')
 const uploadRouter = Router()
 const fs = require('fs')
 const path = require('node:path')
@@ -30,9 +30,13 @@ const upload = multer({storage: storage});
 uploadRouter.get('/:id',  displayDashboard)
 // must add uploadFile function
 uploadRouter.post('/upload', upload.single('fileBackup'), uploadFile)
-uploadRouter.get('/:id/create',  (req, res) => { res.render('createFolder')})
+uploadRouter.get('/:id/create',  displayCreateFolderPage)
 uploadRouter.post('/:id/create',  createFolder)
 // uploadRouter.get(/(?:\/:id){2,}/,  createFolder)
-uploadRouter.get(/(?:\/.+){2,}\/:id/,  createFolder)
+uploadRouter.get(/\/(.*)\/create$/,  displayCreateFolderPage)
+uploadRouter.post(/\/(.*)\/create$/,  createFolder)
+uploadRouter.get(/\/(.*)\/update$/,  displayUpdateFolderPage)
+uploadRouter.post(/\/(.*)\/update$/,  updateFolder)
+uploadRouter.get(/\/(.*)$/,  displayFolder)
 
 module.exports = uploadRouter
