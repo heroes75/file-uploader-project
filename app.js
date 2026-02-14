@@ -40,7 +40,6 @@ app.use(express.urlencoded({extended: true}))
 app.use(passport.session())
 app.use((req, res, next) => {
     res.locals.currentUser = req.user
-    console.log('res.locals.currentUser :', res.locals.currentUser )
     next()
 })
 
@@ -51,7 +50,7 @@ app.use('/login', loginRouter)
 app.use('/logout', logoutRouter)
 app.use('/dashboard', uploadRouter)
 
-app.listen(8888, (err) => {
+app.listen(8000, (err) => {
     if (err) {
         console.error(err)
     }
@@ -72,6 +71,6 @@ app.listen(8888, (err) => {
     //     console.error( e)
     //     await prisma.$disconnect()
     // }) 
-    console.log('listen at port http://localhost:8888')
+    console.log('listen at port http://localhost:8000')
     
 })

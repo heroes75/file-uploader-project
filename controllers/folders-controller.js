@@ -20,7 +20,6 @@ function uploadFile(req, res) {
 }
 
 async function createFolder(req, res, next) {
-    console.log("req.url createFolder:", req.originalUrl);
     const url = req.originalUrl.replace("/create", "");
     const parentFolder = await prisma.folder.findFirst({
         where: {
@@ -28,6 +27,10 @@ async function createFolder(req, res, next) {
         },
     });
     console.log("parentFolder:", parentFolder);
+    if (!parentFolder) {
+        res.status(404).send("<h1>this file don't exist");
+        return;
+    }
     const { folderName } = req.body;
     const createFolder = await prisma.folder.create({
         data: {
@@ -38,14 +41,12 @@ async function createFolder(req, res, next) {
             folderUrl: parentFolder.folderUrl + "/" + folderName,
         },
     });
-    console.log("createFolder:", createFolder);
     fs.mkdirSync(path.join(__dirname, createFolder.destination));
     res.redirect(url);
     next();
 }
 
 async function displayFolder(req, res) {
-    console.log("req:", req.originalUrl);
     const folder = await prisma.folder.findFirst({
         where: {
             folderUrl: req.originalUrl.replace("/create", ""),
@@ -54,8 +55,16 @@ async function displayFolder(req, res) {
             folders: true,
         },
     });
-    console.log("folders:", folder);
-    res.render("displayFolder", { folder: folder });
+    const parentFolder = await prisma.folder.findFirst({
+        where: {
+            id: folder.parentId,
+        },
+    });
+    if (!folder) {
+        res.status(404).send("<h1>this file or folder don't exist");
+        return;
+    }
+    res.render("displayFolder", { folder: folder, parentFolder: parentFolder });
 }
 
 const displayCreateFolderPage = async (req, res) => {
@@ -65,6 +74,10 @@ const displayCreateFolderPage = async (req, res) => {
             folderUrl: url,
         },
     });
+    if (!folder) {
+        res.status(404).send("<h1>this file don't exist");
+        return;
+    }
     res.render("createFolder", { folderUrl: folder.folderUrl });
 };
 
@@ -74,33 +87,159 @@ async function displayUpdateFolderPage(req, res) {
             folderUrl: req.originalUrl.replace("/update", ""),
         },
     });
-    console.log("folder:", folder);
+    if (!folder) {
+        res.status(404).send("<h1>this file don't exist");
+        return;
+    }
     res.render("updateFolder", { folder });
 }
 
 const updateFolder = async (req, res) => {
-    console.log('res:', res.locals)
     const { name } = req.body;
-    const parentUrl = req.originalUrl.replace("/update", "").replace(/\/\w+$/, '')
-    const parentDestination = '../../../uploaded-file' + req.originalUrl.replace("/update", "").replace(/\/\w+$/, '').replace('/dashboard', '')
-    const destination = '../../../uploaded-file' + req.originalUrl.replace("/update", "").replace('/dashboard', '')
-    console.log('destination:', destination)
-    console.log('parentDestination:', parentDestination)
-    console.log('parentUrl:', parentUrl)
-    fs.renameSync(destination, parentDestination + '/' + name)
-    const folder = await prisma.folder.update({
+    // console.log("name:", name);
+    const parentUrl = req.originalUrl
+        .replace("/update", "")
+        .replace(/\/[^\/]+$/, "");
+    const oldNameFolder = /\/[^\/]+$/.exec(
+        req.originalUrl.replace("/update", ""),
+    )[0];
+    // console.log("oldNameFolder:", oldNameFolder);
+    const parentDestination =
+        "../../../uploaded-file" +
+        req.originalUrl
+            .replace("/update", "")
+            .replace(/\/[^\/]+$/, "")
+            .replace("/dashboard", "");
+    const destination =
+        "../../../uploaded-file" +
+        req.originalUrl.replace("/update", "").replace("/dashboard", "");
+    const newDestination = parentDestination + "/" + name;
+    // console.log("destination:", destination);
+    // console.log("parentDestination:", parentDestination);
+    // console.log("parentUrl:", parentUrl);
+    const existFile = fs.existsSync(path.join(__dirname, destination));
+    console.log(
+        "path.join(__dirname, destination):",
+        path.join(__dirname, destination),
+    );
+    console.log("existFile:", existFile);
+    try {
+        const folder = await prisma.folder.update({
+            where: {
+                folderUrl: req.originalUrl.replace("/update", ""),
+            },
+            data: {
+                name: name,
+                folderUrl: parentUrl + "/" + name,
+                destination: (() => {
+                    if (existFile) {
+                        fs.renameSync(
+                            path.join(__dirname, destination),
+                            path.join(
+                                __dirname,
+                                parentDestination + "/" + name,
+                            ),
+                        );
+                        console.log("file updated");
+                    } else {
+                        console.error("file does not updated");
+                    }
+                    return newDestination;
+                })(),
+            },
+            include: {
+                folders: true,
+            },
+        });
+        console.log("folder.folderUrl:", folder.folderUrl);
+        async function updateChildren(childrenFolder) {
+            console.log("childrenFolder:", childrenFolder);
+            // console.log('childrenFolder.folders:', childrenFolder.folders)
+            if (childrenFolder.length === 0) {
+                return;
+            }
+            for (const subFolder of childrenFolder) {
+                const updateSubFolder = await prisma.folder.update({
+                    where: {
+                        folderUrl: subFolder.folderUrl,
+                    },
+                    data: {
+                        folderUrl: subFolder.folderUrl.replace(
+                            oldNameFolder,
+                            "/" + name,
+                        ),
+                        destination: subFolder.destination.replace(
+                            oldNameFolder,
+                            "/" + name,
+                        ),
+                    },
+                    include: {
+                        folders: true,
+                    },
+                });
+                console.log("updateSubFolder:", updateSubFolder);
+                updateChildren(updateSubFolder.folders);
+            }
+        }
+        updateChildren(folder.folders);
+
+        res.redirect(parentUrl);
+    } catch (error) {
+        console.error("error:", error);
+
+        res.status(404).send("<h1>this file or folder doesn't exist</h1>");
+    }
+};
+async function deleteFolder(req, res) {
+    const url = req.originalUrl.replace("/delete", "");
+    const folder = await prisma.folder.findUnique({
         where: {
-            folderUrl: req.originalUrl.replace("/update", ""),
+            folderUrl: url,
         },
-        data: {
-            name: name,
-            folderUrl: parentUrl.parentId + '/' + name,
-            destination: parentDestination + '/' + name,
+        include: {
+            folders: true,
         },
     });
-    console.log("folder.folderUrl:", folder.folderUrl);
-    res.redirect(folder.folderUrl);
-};
+    const parentFolder = await prisma.folder.findUnique({
+        where: {
+            id: folder.parentId,
+        },
+    });
+    async function deleteChildren(childrenFolder) {
+        console.log("childrenFolder:", childrenFolder);
+        if (childrenFolder.folders.length === 0) {
+            const deleteFolder = await prisma.folder.delete({
+                where: {
+                    id: childrenFolder.id,
+                },
+            });
+            console.log("deleteFolder:", deleteFolder);
+            return;
+        }
+        for (const subFolder of childrenFolder.folders) {
+            const subFolderChildren = await prisma.folder.findUnique({
+                where: {
+                    id: subFolder.id,
+                },
+                include: {
+                    folders: true,
+                },
+            });
+
+            console.log("subFolder:", subFolderChildren);
+            deleteChildren(subFolderChildren);
+        }
+        const deleteChildrenFolder = await prisma.folder.delete({
+            where: {
+                id: childrenFolder.id,
+            },
+        });
+        console.log("deleteChildrenFolder:", deleteChildrenFolder);
+    }
+    deleteChildren(folder);
+    fs.rmdirSync(path.join(__dirname, folder.destination), { recursive: true });
+    res.redirect(parentFolder.folderUrl);
+}
 
 module.exports = {
     displayDashboard,
@@ -110,4 +249,5 @@ module.exports = {
     displayCreateFolderPage,
     displayUpdateFolderPage,
     updateFolder,
+    deleteFolder,
 };

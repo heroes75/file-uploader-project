@@ -6,6 +6,7 @@
     <title><%= locals.folder.name || "Error" %></title>
 </head>
 <body>
+    <a href="<%= locals.parentFolder.folderUrl %>"><%= locals.parentFolder.name %></a>
     <h1>folders of <%= locals.folder.name %></h1>
     <%- include('partials/displaySubFolders', {folders: locals.folder.folders}) %>
     <a href="<%= locals.folder.folderUrl %>/create">Create a sub folder</a>

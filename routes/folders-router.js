@@ -1,5 +1,5 @@
 const {Router} = require('express')
-const { displayDashboard, uploadFile, createFolder, displayFolder, displayCreateFolderPage, displayUpdateFolderPage, updateFolder } = require('../controllers/folders-controller')
+const { displayDashboard, uploadFile, createFolder, displayFolder, displayCreateFolderPage, displayUpdateFolderPage, updateFolder, deleteFolder } = require('../controllers/folders-controller')
 const uploadRouter = Router()
 const fs = require('fs')
 const path = require('node:path')
@@ -37,6 +37,7 @@ uploadRouter.get(/\/(.*)\/create$/,  displayCreateFolderPage)
 uploadRouter.post(/\/(.*)\/create$/,  createFolder)
 uploadRouter.get(/\/(.*)\/update$/,  displayUpdateFolderPage)
 uploadRouter.post(/\/(.*)\/update$/,  updateFolder)
+uploadRouter.post(/\/(.*)\/delete$/,  deleteFolder)
 uploadRouter.get(/\/(.*)$/,  displayFolder)
 
 module.exports = uploadRouter
