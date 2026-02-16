@@ -18,5 +18,15 @@
     <div>
         <%= file.uploadedAt %>
     </div>
+    <div>
+        <form action="/file<%= file.fileUrl %>/download" method="post">
+            <button type="submit">Download</button>
+        </form>
+    </div>
+    <div>
+        <form action="/file<%= file.fileUrl %>/delete" method="post">
+            <button type="submit">Delete this file</button>
+        </form>
+    </div>
 </body>
 </html>

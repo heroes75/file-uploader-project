@@ -31,7 +31,7 @@ async function uploadFile(req, res) {
     const createFile = await prisma.files.create({
         data: {
             folderId: folder.id,
-            fileUrl: file.destination.replace('home/emmanuel75', 'dashboard') + name,
+            fileUrl: file.destination.replace('home/emmanuel75/uploaded-file', 'dashboard') + name,
             destinationId: '..' + file.path.replace('home', '..').replace('emmanuel75', '..'),
             name: name.slice(1),
             originalName: file.originalname
@@ -137,9 +137,6 @@ const updateFolder = async (req, res) => {
         "../../../uploaded-file" +
         req.originalUrl.replace("/update", "").replace("/dashboard", "");
     const newDestination = parentDestination + "/" + name;
-    // console.log("destination:", destination);
-    // console.log("parentDestination:", parentDestination);
-    // console.log("parentUrl:", parentUrl);
     const existFile = fs.existsSync(path.join(__dirname, destination));
     console.log(
         "path.join(__dirname, destination):",
