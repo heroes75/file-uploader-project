@@ -6,30 +6,40 @@ const path = require('node:path')
 
 
 const multer = require("multer");
+const prisma = require('../lib/prisma')
 const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        const folderExists = fs.existsSync(path.join(__dirname,  `../../../uploaded-file/${req.user.username}`))
+    destination: async function (req, file, cb) {
+        console.log('req.originalUrl multer:', req.originalUrl.replace('/upload', ''))
+        const folder = await prisma.folder.findFirst({
+            where: {
+                folderUrl: req.originalUrl.replace('/upload', '')
+            }
+        })
+        console.log('folder:', folder)
+        const realDestination = path.join(__dirname,  folder.destination)
+        const folderExists = fs.existsSync(realDestination)
         console.log('folderExists:', folderExists)
         if(!folderExists) {
-            fs.mkdirSync(path.join(__dirname,  `../../../uploaded-file/${req.user.username}`), err => {
+            fs.mkdirSync(realDestination, err => {
                 if(err) return console.error(err)
                 console.log('Directory created successfully!');
             })
         }
-        cb(null, `/home/emmanuel75/uploaded-file/${req.user.username}`)
+        cb(null, realDestination)
     },
     filename: function (req, file, cb) {
+        const ext = '.' + file.mimetype.replace(/^([^\/]+)\//, "")
         const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-        cb(null, file.fieldname + "-" + uniqueSuffix);
+        cb(null, file.originalname + "-" + uniqueSuffix + ext);
     },
 });
 
 const upload = multer({storage: storage});
 
 
-uploadRouter.get('/:id',  displayDashboard)
+uploadRouter.get('/:id', displayDashboard)
 // must add uploadFile function
-uploadRouter.post('/upload', upload.single('fileBackup'), uploadFile)
+uploadRouter.post('/:id/upload', upload.single('fileBackup'), uploadFile)
 uploadRouter.get('/:id/create',  displayCreateFolderPage)
 uploadRouter.post('/:id/create',  createFolder)
 // uploadRouter.get(/(?:\/:id){2,}/,  createFolder)

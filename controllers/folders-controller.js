@@ -9,13 +9,36 @@ async function displayDashboard(req, res) {
         },
         include: {
             folders: true,
+            files: true
         },
     });
-    console.log("folders:", folders);
-    res.render("dashboard", { folders: folders.folders });
+    console.log("folders of dashboard:", folders);
+    res.render("dashboard", { folders: folders.folders, files: folders.files, folderUrl: folders.folderUrl });
 }
 
-function uploadFile(req, res) {
+async function uploadFile(req, res) {
+    console.log('upload start..')
+    console.log('req.file', req.file)
+    const file = req.file
+    const name = /\/[^\/]+$/.exec(file.path)[0]
+    console.log('name:', name)
+    const folder = await prisma.folder.findUnique({
+        where: {
+            destination: '..' + file.destination.replace('home', '..').replace('emmanuel75', '..')
+        }
+    })
+    console.log('folder:', folder)
+    const createFile = await prisma.files.create({
+        data: {
+            folderId: folder.id,
+            fileUrl: file.destination.replace('home/emmanuel75', 'dashboard') + name,
+            destinationId: '..' + file.path.replace('home', '..').replace('emmanuel75', '..'),
+            name: name.slice(1),
+            originalName: file.originalname
+        }
+    })
+    console.log('createFile:', createFile)
+    console.log('upload end..')
     res.redirect("/dashboard/" + req.user.username);
 }
 
@@ -57,7 +80,7 @@ async function displayFolder(req, res) {
     });
     const parentFolder = await prisma.folder.findFirst({
         where: {
-            id: folder.parentId,
+            id: folder.folderId,
         },
     });
     if (!folder) {
@@ -229,12 +252,12 @@ async function deleteFolder(req, res) {
             console.log("subFolder:", subFolderChildren);
             deleteChildren(subFolderChildren);
         }
-        const deleteChildrenFolder = await prisma.folder.delete({
+        const deletedAllChildrenFolder = await prisma.folder.delete({
             where: {
                 id: childrenFolder.id,
             },
         });
-        console.log("deleteChildrenFolder:", deleteChildrenFolder);
+        console.log("deletedAllChildrenFolder:", deletedAllChildrenFolder);
     }
     deleteChildren(folder);
     fs.rmdirSync(path.join(__dirname, folder.destination), { recursive: true });

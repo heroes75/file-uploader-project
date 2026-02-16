@@ -1,0 +1,6 @@
+<% if (locals.files) { %>
+    <% for( const file of files ) { %>
+        <div><a href="/file<%= file.fileUrl %>"><%= file.originalName.replace(/-.*/, '') %></a></div>
+        <form action="<%=  %>" method="post"></form>
+    <% } %>
+<% } %>

@@ -50,27 +50,10 @@ app.use('/login', loginRouter)
 app.use('/logout', logoutRouter)
 app.use('/dashboard', uploadRouter)
 
-app.listen(8000, (err) => {
+app.listen(8888, (err) => {
     if (err) {
         console.error(err)
     }
-
-    // async function main(id) {
-    //     const user = await prisma.user.findUnique({
-    //     where: {
-    //         id: id
-    //     }
-    // })
-    //     console.log('user:', user)
-
-    // } 
-
-    // main(1).then(async () => {
-    //     await prisma.$disconnect()
-    // }).catch(async e => {
-    //     console.error( e)
-    //     await prisma.$disconnect()
-    // }) 
-    console.log('listen at port http://localhost:8000')
+    console.log('listen at port http://localhost:8888')
     
 })

@@ -29,8 +29,10 @@ model User {
 
 model Files {
     id                  String @id @default(uuid())
-    name                String 
+    name                String
+    originalName        String
     fileUrl             String @unique
+    uploadedAt          DateTime @default(now())
     destinationFolder   Folder @relation(fields: [folderId], references: [id])
     folderId String
     destinationId       String
