@@ -9,6 +9,8 @@
     <a href="<%= locals.parentFolder.folderUrl %>"><%= locals.parentFolder.name %></a>
     <h1>folders of <%= locals.folder.name %></h1>
     <%- include('partials/displaySubFolders', {folders: locals.folder.folders}) %>
+    <%- include('partials/displayFiles', {files: locals.files}) %>
+    <%- include('partials/uploadForm', {folderUrl: locals.folder.folderUrl}) %>
     <a href="<%= locals.folder.folderUrl %>/create">Create a sub folder</a>
 </body>
 </html>

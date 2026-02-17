@@ -9,37 +9,51 @@ async function displayDashboard(req, res) {
         },
         include: {
             folders: true,
-            files: true
+            files: true,
         },
     });
     console.log("folders of dashboard:", folders);
-    res.render("dashboard", { folders: folders.folders, files: folders.files, folderUrl: folders.folderUrl });
+    res.render("dashboard", {
+        folders: folders.folders,
+        files: folders.files,
+        folderUrl: folders.folderUrl,
+    });
 }
 
 async function uploadFile(req, res) {
-    console.log('upload start..')
-    console.log('req.file', req.file)
-    const file = req.file
-    const name = /\/[^\/]+$/.exec(file.path)[0]
-    console.log('name:', name)
+    // console.log('upload start..')
+    // console.log('req.file', req.file)
+    const file = req.file;
+    const name = /\/[^\/]+$/.exec(file.path)[0];
+    // console.log('name:', name)
     const folder = await prisma.folder.findUnique({
         where: {
-            destination: '..' + file.destination.replace('home', '..').replace('emmanuel75', '..')
-        }
-    })
-    console.log('folder:', folder)
+            destination:
+                ".." +
+                file.destination
+                    .replace("home", "..")
+                    .replace("emmanuel75", ".."),
+        },
+    });
+    // console.log('folder:', folder)
     const createFile = await prisma.files.create({
         data: {
             folderId: folder.id,
-            fileUrl: file.destination.replace('home/emmanuel75/uploaded-file', 'dashboard') + name,
-            destinationId: '..' + file.path.replace('home', '..').replace('emmanuel75', '..'),
+            fileUrl:
+                file.destination.replace(
+                    "home/emmanuel75/uploaded-file",
+                    "dashboard",
+                ) + name,
+            destinationId:
+                ".." +
+                file.path.replace("home", "..").replace("emmanuel75", ".."),
             name: name.slice(1),
-            originalName: file.originalname
-        }
-    })
-    console.log('createFile:', createFile)
-    console.log('upload end..')
-    res.redirect("/dashboard/" + req.user.username);
+            originalName: file.originalname,
+        },
+    });
+    console.log("createFile:", createFile);
+    // console.log('upload end..')
+    res.redirect(folder.folderUrl);
 }
 
 async function createFolder(req, res, next) {
@@ -49,45 +63,63 @@ async function createFolder(req, res, next) {
             folderUrl: url,
         },
     });
-    console.log("parentFolder:", parentFolder);
+    // console.log("parentFolder:", parentFolder);
     if (!parentFolder) {
         res.status(404).send("<h1>this file don't exist");
         return;
     }
     const { folderName } = req.body;
-    const createFolder = await prisma.folder.create({
-        data: {
-            userId: +req.user.id,
-            name: folderName,
-            parentId: parentFolder.id,
-            destination: parentFolder.destination + "/" + folderName,
-            folderUrl: parentFolder.folderUrl + "/" + folderName,
-        },
+    const destination = parentFolder.destination + "/" + folderName;
+    const existingFolder = await prisma.folder.findUnique({
+        where: { destination: destination },
     });
-    fs.mkdirSync(path.join(__dirname, createFolder.destination));
+    console.log('existingFolder:', existingFolder)
+    if (existingFolder) {
+        return res
+            .status(400)
+            .json({ error: "Un dossier avec ce nom existe déjà ici." });
+    }
+
+    // const createFolder = await prisma.folder.create({
+    //     data: {
+    //         userId: +req.user.id,
+    //         name: folderName,
+    //         parentId: parentFolder.id,
+    //         folderUrl: parentFolder.folderUrl + "/" + folderName,
+    //         destination,
+    //     },
+    // });
+    // console.log("createFolder:", createFolder);
+    // fs.mkdirSync(path.join(__dirname, createFolder.destination));
     res.redirect(url);
     next();
 }
 
 async function displayFolder(req, res) {
+    console.log('AAAAAAAAAAAAAAHHHHHHHHHHHHHHHHHh')
     const folder = await prisma.folder.findFirst({
         where: {
             folderUrl: req.originalUrl.replace("/create", ""),
         },
         include: {
             folders: true,
+            files: true,
         },
     });
     const parentFolder = await prisma.folder.findFirst({
         where: {
-            id: folder.folderId,
+            id: folder.parentId,
         },
     });
     if (!folder) {
         res.status(404).send("<h1>this file or folder don't exist");
         return;
     }
-    res.render("displayFolder", { folder: folder, parentFolder: parentFolder });
+    res.render("displayFolder", {
+        folder: folder,
+        parentFolder: parentFolder,
+        files: folder.files,
+    });
 }
 
 const displayCreateFolderPage = async (req, res) => {
@@ -169,12 +201,32 @@ const updateFolder = async (req, res) => {
             },
             include: {
                 folders: true,
+                files: true,
             },
         });
         console.log("folder.folderUrl:", folder.folderUrl);
-        async function updateChildren(childrenFolder) {
+        async function updateChildren(childrenFolder, childrenFile) {
             console.log("childrenFolder:", childrenFolder);
             // console.log('childrenFolder.folders:', childrenFolder.folders)
+            if (childrenFile.length !== 0) {
+                for (const file of childrenFile) {
+                    const updatedFile = await prisma.files.update({
+                        where: {
+                            id: file.id,
+                        },
+                        data: {
+                            fileUrl: file.fileUrl.replace(
+                                oldNameFolder,
+                                "/" + name,
+                            ),
+                            destinationId: file.destinationId.replace(
+                                oldNameFolder,
+                                "/" + name,
+                            ),
+                        },
+                    });
+                }
+            }
             if (childrenFolder.length === 0) {
                 return;
             }
@@ -195,13 +247,14 @@ const updateFolder = async (req, res) => {
                     },
                     include: {
                         folders: true,
+                        files: true,
                     },
                 });
                 console.log("updateSubFolder:", updateSubFolder);
-                updateChildren(updateSubFolder.folders);
+                updateChildren(updateSubFolder.folders, updateSubFolder.files);
             }
         }
-        updateChildren(folder.folders);
+        updateChildren(folder.folders, folder.files);
 
         res.redirect(parentUrl);
     } catch (error) {
@@ -218,6 +271,7 @@ async function deleteFolder(req, res) {
         },
         include: {
             folders: true,
+            files: true,
         },
     });
     const parentFolder = await prisma.folder.findUnique({
@@ -227,6 +281,16 @@ async function deleteFolder(req, res) {
     });
     async function deleteChildren(childrenFolder) {
         console.log("childrenFolder:", childrenFolder);
+        if (childrenFolder.files.length !== 0) {
+            for (const file of childrenFolder.files) {
+                const deletedFile = await prisma.files.delete({
+                    where: {
+                        id: file.id,
+                    },
+                });
+            }
+        }
+
         if (childrenFolder.folders.length === 0) {
             const deleteFolder = await prisma.folder.delete({
                 where: {
@@ -243,9 +307,9 @@ async function deleteFolder(req, res) {
                 },
                 include: {
                     folders: true,
+                    files: true,
                 },
             });
-
             console.log("subFolder:", subFolderChildren);
             deleteChildren(subFolderChildren);
         }

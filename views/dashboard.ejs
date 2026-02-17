@@ -9,11 +9,7 @@
     hello <%= locals.currentUser.username %>
     <%- include('partials/displaySubFolders', {folders: locals.folders}) %>
     <%- include('partials/displayFiles', {files: locals.files}) %>
-    <form action="<%= locals.folderUrl %>/upload" method="post" enctype="multipart/form-data">
-        <label for="fileBackup">Upload your file: </label>
-        <input type="file" name="fileBackup" id="fileBackup">
-        <button type="submit">Upload</button>
-    </form>
+    <%- include('partials/uploadForm', {folderUrl: locals.folderUrl}) %>
     <a href="/dashboard/<%=currentUser.username%>/create">create a folder</a>
 </body>
 </html>

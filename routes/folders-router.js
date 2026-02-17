@@ -30,7 +30,7 @@ const storage = multer.diskStorage({
     filename: function (req, file, cb) {
         const ext = '.' + file.mimetype.replace(/^([^\/]+)\//, "")
         const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-        cb(null, file.originalname + "-" + uniqueSuffix + ext);
+        cb(null, file.originalname.replace(/[^\x00-\x7F]+/g, '') + "-" + uniqueSuffix + ext);
     },
 });
 
@@ -48,6 +48,7 @@ uploadRouter.post(/\/(.*)\/create$/,  createFolder)
 uploadRouter.get(/\/(.*)\/update$/,  displayUpdateFolderPage)
 uploadRouter.post(/\/(.*)\/update$/,  updateFolder)
 uploadRouter.post(/\/(.*)\/delete$/,  deleteFolder)
+uploadRouter.post(/\/(.*)\/upload$/,  upload.single('fileBackup'), uploadFile)
 uploadRouter.get(/\/(.*)$/,  displayFolder)
 
 module.exports = uploadRouter

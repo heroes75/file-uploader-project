@@ -8,7 +8,8 @@ async function displayFileInfo(req, res) {
             fileUrl: req.originalUrl.replace('/file', '').replace(/%(?:20)?/g, ' ')
         }
     })
-    console.log('req.originalUrl.replace("/file", ).replace(/%(?:20)?/g, " " ):', req.originalUrl.replace("/file", ).replace(/%/g, " " ))
+    console.log('req.originalUrl.replace("/file", ).replace(/%(?:20)?/g, " " ):', req.originalUrl.replace("/file", ).replace(/%(?:20)?/g, ' '))
+    console.log('req.originalUrl:', req.originalUrl)
     console.log('file:', file)
     res.render('displayFileInfo', {file})
 }
