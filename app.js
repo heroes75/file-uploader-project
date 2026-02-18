@@ -16,6 +16,7 @@ const fileRouter = require('./routes/file.router')
 
 
 const app = express()
+const PORT = 8800
 
 
 app.set('view engine', 'ejs')
@@ -52,10 +53,10 @@ app.use('/logout', logoutRouter)
 app.use('/dashboard', uploadRouter)
 app.use('/file', fileRouter)
 
-app.listen(8888, (err) => {
+app.listen(PORT, (err) => {
     if (err) {
         console.error(err)
     }
-    console.log('listen at port http://localhost:8888')
+    console.log(`listen at port http://localhost:${PORT}`)
     
 })

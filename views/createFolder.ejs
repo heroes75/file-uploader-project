@@ -7,6 +7,7 @@
 </head>
 <body>
     <form action="<%= locals.folderUrl %>/create" method="post">
+        <%- include('partials/errors', {errors: locals.errors}) %>
         <label for="folderName"> Enter your folder name</label>
         <input type="text" name="folderName" id="folderName" required>
         <button type="submit">Submit</button>

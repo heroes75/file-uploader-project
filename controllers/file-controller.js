@@ -8,10 +8,15 @@ async function displayFileInfo(req, res) {
             fileUrl: req.originalUrl.replace('/file', '').replace(/%(?:20)?/g, ' ')
         }
     })
+    const parentFolder = await prisma.folder.findUnique({
+        where: {
+            id: file.folderId
+        }
+    })
     console.log('req.originalUrl.replace("/file", ).replace(/%(?:20)?/g, " " ):', req.originalUrl.replace("/file", ).replace(/%(?:20)?/g, ' '))
     console.log('req.originalUrl:', req.originalUrl)
     console.log('file:', file)
-    res.render('displayFileInfo', {file})
+    res.render('displayFileInfo', {file, parentFolder})
 }
 
 async function downloadFile(req, res) {
