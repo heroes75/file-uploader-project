@@ -1,5 +1,5 @@
 const {Router} = require('express')
-const { displayDashboard, uploadFile, createFolder, displayFolder, displayCreateFolderPage, displayUpdateFolderPage, updateFolder, deleteFolder, validNameFolder } = require('../controllers/folders-controller')
+const { displayDashboard, uploadFile, createFolder, displayFolder, displayCreateFolderPage, displayUpdateFolderPage, updateFolder, deleteFolder, validNameFolder, validUpdateFolder } = require('../controllers/folders-controller')
 const uploadRouter = Router()
 const fs = require('fs')
 const path = require('node:path')
@@ -9,6 +9,7 @@ const multer = require("multer");
 const prisma = require('../lib/prisma')
 const storage = multer.diskStorage({
     destination: async function (req, file, cb) {
+        console.log('file:', file)
         console.log('req.originalUrl multer:', req.originalUrl.replace('/upload', ''))
         const folder = await prisma.folder.findFirst({
             where: {
@@ -46,7 +47,7 @@ uploadRouter.get('/:id/create',  displayCreateFolderPage)
 uploadRouter.get(/\/(.*)\/create$/,  displayCreateFolderPage)
 uploadRouter.post(/\/(.*)\/create$/, validNameFolder, createFolder)
 uploadRouter.get(/\/(.*)\/update$/,  displayUpdateFolderPage)
-uploadRouter.post(/\/(.*)\/update$/, validNameFolder, updateFolder)
+uploadRouter.post(/\/(.*)\/update$/, validUpdateFolder, updateFolder)
 uploadRouter.post(/\/(.*)\/delete$/,  deleteFolder)
 uploadRouter.post(/\/(.*)\/upload$/,  upload.single('fileBackup'), uploadFile)
 uploadRouter.get(/\/(.*)$/,  displayFolder)

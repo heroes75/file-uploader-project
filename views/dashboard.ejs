@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
+    <link rel="stylesheet" href="/styleDashboard.css">
+    <script src="/script/scripts-upload.js" defer></script>
 </head>
 <body>
     hello <%= locals.currentUser.username %>
@@ -11,5 +13,6 @@
     <%- include('partials/displayFiles', {files: locals.files}) %>
     <%- include('partials/uploadForm', {folderUrl: locals.folderUrl}) %>
     <a href="/dashboard/<%=currentUser.username%>/create">create a folder</a>
+    
 </body>
 </html>

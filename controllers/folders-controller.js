@@ -1,27 +1,63 @@
 const fs = require("node:fs");
 const prisma = require("../lib/prisma");
 const path = require("node:path");
-const {matchedData, validationResult, body} = require('express-validator');
+const { matchedData, validationResult, body } = require("express-validator");
+const { supabase } = require("../utlis/supabase");
+const { REALTIME_PRESENCE_LISTEN_EVENTS } = require("@supabase/supabase-js");
 
-
-const validNameFolder = body('folderName').custom(async (value, {req}) => {
-    const url = req.originalUrl.replace(/\/update|\/create/, '');
-    const folderParent = await prisma.folder.findUnique({
-        where: {
-            folderUrl: url
-        },
-        include: {
-            folders: true
+const validNameFolder = body("folderName")
+    .custom(async (value, { req }) => {
+        const url = req.originalUrl.replace(/\/update|\/create/, "");
+        const folderParent = await prisma.folder.findUnique({
+            where: {
+                folderUrl: url,
+            },
+            include: {
+                folders: true,
+            },
+        });
+        const existingFolder = folderParent.folders
+            .map((folder) => folder.name)
+            .includes(value);
+        if (existingFolder) {
+            throw new Error("this name is already taken in this folder");
         }
     })
-    const existingFolder = folderParent.folders.map(folder => folder.name).includes(value)
-    if (existingFolder) {
-        throw new Error('this name is already taken in this folder');
-    }
-}).withMessage('this name is already taken in this folder')
+    .withMessage("this name is already taken in this folder");
 
+const validUpdateFolder = body("name")
+    .custom(async (value, { req }) => {
+        console.log('value:', value)
+        const url = req.originalUrl.replace(/\/update|\/create/, "");
+        const folder = await prisma.folder.findUnique({
+            where: {
+                folderUrl: url,
+            },
+            include: {
+                folders: true,
+            },
+        });
+        const folderParent = await prisma.folder.findUnique({
+            where: {
+                id: folder.parentId
+            },
+            include: {
+                folders: true
+            }
+        })
+        console.log('folderParent:', folderParent)
+        const existingFolder = folderParent.folders.map((folder) => folder.name).includes(value) && value !== folder.name;
+        console.log('existingFolder:', existingFolder)
+        if (existingFolder) {
+            throw new Error("this name is already taken in this folder");
+        }
+    })
+    .withMessage("this name is already taken in this folder");
 
 async function displayDashboard(req, res) {
+    // const form = document.querySelector('#form')
+    // console.log('form:', form)
+
     const folders = await prisma.folder.findFirst({
         where: {
             destination: `../../../uploaded-file/${req.user.username}`,
@@ -31,7 +67,7 @@ async function displayDashboard(req, res) {
             files: true,
         },
     });
-    console.log("folders of dashboard:", folders);
+    // console.log("folders of dashboard:", folders);
     res.render("dashboard", {
         folders: folders.folders,
         files: folders.files,
@@ -39,9 +75,9 @@ async function displayDashboard(req, res) {
     });
 }
 
-async function uploadFile(req, res) {
+async function uploadFile(req, res, next) {
     // console.log('upload start..')
-    console.log('req.file', req.file)
+    console.log("req.file", req.file);
     const file = req.file;
     const name = /\/[^\/]+$/.exec(file.path)[0];
     // console.log('name:', name)
@@ -71,38 +107,47 @@ async function uploadFile(req, res) {
         },
     });
     console.log("createFile:", createFile);
+    // const fileAdded = event.target.files[0]
+    const {data, error} = await supabase.storage.from('folderOfFolders').upload(`home`, req,file)
+    if (error) {
+        console.log("gail")
+        console.error(error)
+    } else {
+        console.log(data)
+        console.log("sucess")
+    }
     // console.log('upload end..')
-    res.redirect(folder.folderUrl);
+    // To Add
+    // res.redirect(folder.folderUrl);
+    // next()
 }
 
-
 async function createFolder(req, res, next) {
-    const errors = validationResult(req)
-    console.log('!errors.isEmpty():', !errors.isEmpty())
-    
-    const url = req.originalUrl.replace("/create", "").replaceAll('%20', ' ');
+    const errors = validationResult(req);
+    const url = req.originalUrl.replace("/create", "").replaceAll("%20", " ");
     const parentFolder = await prisma.folder.findFirst({
         where: {
             folderUrl: url,
         },
     });
-    // console.log("parentFolder:", parentFolder);
     if (!parentFolder) {
-        res.status(404).send("<h1>this file don't exist");
+        res.status(404).send("<h1>this file don't exist</h1>");
         return;
     }
     if (!errors.isEmpty()) {
-        res.render('createFolder', {errors: errors.errors, folderUrl: parentFolder.folderUrl})
-        return
+        res.render("createFolder", {
+            errors: errors.errors,
+            folderUrl: parentFolder.folderUrl,
+        });
+        return;
     }
     const { folderName } = matchedData(req);
     const destination = parentFolder.destination + "/" + folderName;
     const existingFolder = await prisma.folder.findUnique({
         where: { destination: destination },
     });
-    console.log('existingFolder:', existingFolder)
+    console.log("existingFolder:", existingFolder);
     if (existingFolder) {
-        console.log('Un dossier avec ce nom existe déjà ici.')
         return res
             .status(400)
             .json({ error: "Un dossier avec ce nom existe déjà ici." });
@@ -126,7 +171,9 @@ async function createFolder(req, res, next) {
 async function displayFolder(req, res) {
     const folder = await prisma.folder.findFirst({
         where: {
-            folderUrl: req.originalUrl.replace(/\/create/, "").replaceAll('%20', ' '),
+            folderUrl: req.originalUrl
+                .replace(/\/create/, "")
+                .replaceAll("%20", " "),
         },
         include: {
             folders: true,
@@ -150,7 +197,7 @@ async function displayFolder(req, res) {
 }
 
 const displayCreateFolderPage = async (req, res) => {
-    const url = req.originalUrl.replace("/create", "").replaceAll('%20', ' ');
+    const url = req.originalUrl.replace("/create", "").replaceAll("%20", " ");
     const folder = await prisma.folder.findFirst({
         where: {
             folderUrl: url,
@@ -166,7 +213,9 @@ const displayCreateFolderPage = async (req, res) => {
 async function displayUpdateFolderPage(req, res) {
     const folder = await prisma.folder.findFirst({
         where: {
-            folderUrl: req.originalUrl.replace("/update", "").replaceAll('%20', ' '),
+            folderUrl: req.originalUrl
+                .replace("/update", "")
+                .replaceAll("%20", " "),
         },
     });
     if (!folder) {
@@ -177,14 +226,30 @@ async function displayUpdateFolderPage(req, res) {
 }
 
 const updateFolder = async (req, res) => {
-    const { name } = req.body;
+    const errors = validationResult(req);
+    console.log('errors:', errors.errors)
+    const findFolder = await prisma.folder.findUnique({
+        where: {
+            folderUrl: req.originalUrl.replace("/update", "").replaceAll("%20", " "),
+        }
+    })
+    console.log('findFolder:', findFolder)
+    if (!errors.isEmpty()) {
+            res.render("updateFolder", {
+                errors: errors.errors,
+                folder: findFolder,
+            });
+            return;
+        }
     // console.log("name:", name);
+    const { name } = req.body;
+
     const parentUrl = req.originalUrl
         .replace("/update", "")
         .replace(/\/[^\/]+$/, "")
-        .replaceAll('%20', ' ');
+        .replaceAll("%20", " ");
     const oldNameFolder = /\/[^\/]+$/.exec(
-        req.originalUrl.replace("/update", "").replaceAll('%20', ' '),
+        req.originalUrl.replace("/update", "").replaceAll("%20", " "),
     )[0];
     // console.log("oldNameFolder:", oldNameFolder);
     const parentDestination =
@@ -193,22 +258,22 @@ const updateFolder = async (req, res) => {
             .replace("/update", "")
             .replace(/\/[^\/]+$/, "")
             .replace("/dashboard", "")
-            .replaceAll('%20', ' ');
+            .replaceAll("%20", " ");
     const destination =
         "../../../uploaded-file" +
-        req.originalUrl.replace("/update", "").replace("/dashboard", "").replaceAll('%20', ' ');
+        req.originalUrl
+            .replace("/update", "")
+            .replace("/dashboard", "")
+            .replaceAll("%20", " ");
     const newDestination = parentDestination + "/" + name;
     const existFile = fs.existsSync(path.join(__dirname, destination));
-    console.log(
-        "path.join(__dirname, destination):",
-        path.join(__dirname, destination),
-    );
-    console.log("existFile:", existFile);
     try {
         const folder = await prisma.folder.update({
             where: {
-                folderUrl: req.originalUrl.replace("/update", "").replaceAll('%20', ' '),
-            },
+                folderUrl: req.originalUrl
+                    .replace("/update", "")
+                    .replaceAll("%20", " "),
+                },
             data: {
                 name: name,
                 folderUrl: parentUrl + "/" + name,
@@ -234,6 +299,7 @@ const updateFolder = async (req, res) => {
             },
         });
         console.log("folder.folderUrl:", folder.folderUrl);
+        
         async function updateChildren(childrenFolder, childrenFile) {
             console.log("childrenFolder:", childrenFolder);
             // console.log('childrenFolder.folders:', childrenFolder.folders)
@@ -293,7 +359,7 @@ const updateFolder = async (req, res) => {
     }
 };
 async function deleteFolder(req, res) {
-    const url = req.originalUrl.replace("/delete", "").replaceAll('%20', ' ');
+    const url = req.originalUrl.replace("/delete", "").replaceAll("%20", " ");
     const folder = await prisma.folder.findUnique({
         where: {
             folderUrl: url,
@@ -364,4 +430,5 @@ module.exports = {
     updateFolder,
     deleteFolder,
     validNameFolder,
+    validUpdateFolder,
 };
