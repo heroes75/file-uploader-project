@@ -56,14 +56,16 @@ const validUpdateFolder = body("name")
     })
     .withMessage("this name is already taken in this folder");
 
+
+
 async function displayDashboard(req, res) {
     // const form = document.querySelector('#form')
     // console.log('form:', form)
-    const pathIrl = path.join(__dirname, '../folderOfFolder')
+    const pathIrl = path.join(__dirname, '../folderOfFolders')
     console.log('pathIrl:', pathIrl)
     const folders = await prisma.folder.findFirst({
         where: {
-            destination: `../../../uploaded-file/${req.user.username}`,
+            destination: `${req.user.username}`,
         },
         include: {
             folders: true,
@@ -77,6 +79,7 @@ async function displayDashboard(req, res) {
         folderUrl: folders.folderUrl,
     });
 }
+
 
 async function uploadFile(req, res, next) {
     // console.log('upload start..')
@@ -107,7 +110,7 @@ async function uploadFile(req, res, next) {
     console.log("createFile:", createFile);
     const { data, error } = await supabase.storage
         .from("folderOfFolders")
-        .upload(path.join(__dirname, createFile.destinationId), buffer);
+        .upload(createFile.destinationId, buffer, { contentType: ext});
     if (error) {
         console.error(error);
     } else {
@@ -158,7 +161,7 @@ async function createFolder(req, res, next) {
         },
     });
     console.log("createFolder:", createFolder);
-    fs.mkdirSync(path.join(__dirname, createFolder.destination));
+    // fs.mkdirSync(path.join(__dirname, createFolder.destination));
     res.redirect(url);
     next();
 }
@@ -239,7 +242,7 @@ const updateFolder = async (req, res) => {
         return;
     }
     // console.log("name:", name);
-    const { name } = req.body;
+    const { name } = matchedData(req);
 
     const parentUrl = req.originalUrl
         .replace("/update", "")
@@ -250,20 +253,18 @@ const updateFolder = async (req, res) => {
     )[0];
     // console.log("oldNameFolder:", oldNameFolder);
     const parentDestination =
-        "../../../uploaded-file" +
         req.originalUrl
             .replace("/update", "")
             .replace(/\/[^\/]+$/, "")
-            .replace("/dashboard", "")
+            .replace("/dashboard/", "")
             .replaceAll("%20", " ");
-    const destination =
-        "../../../uploaded-file" +
-        req.originalUrl
-            .replace("/update", "")
-            .replace("/dashboard", "")
-            .replaceAll("%20", " ");
+    // const destination =
+    //     req.originalUrl
+    //         .replace("/update", "")
+    //         .replace("/dashboard", "")
+    //         .replaceAll("%20", " ");
     const newDestination = parentDestination + "/" + name;
-    const existFile = fs.existsSync(path.join(__dirname, destination));
+    // const existFile = fs.existsSync(path.join(__dirname, destination));
     try {
         const folder = await prisma.folder.update({
             where: {
@@ -274,21 +275,7 @@ const updateFolder = async (req, res) => {
             data: {
                 name: name,
                 folderUrl: parentUrl + "/" + name,
-                destination: (() => {
-                    if (existFile) {
-                        fs.renameSync(
-                            path.join(__dirname, destination),
-                            path.join(
-                                __dirname,
-                                parentDestination + "/" + name,
-                            ),
-                        );
-                        console.log("file updated");
-                    } else {
-                        console.error("file does not updated");
-                    }
-                    return newDestination;
-                })(),
+                destination: newDestination,
             },
             include: {
                 folders: true,
@@ -317,6 +304,14 @@ const updateFolder = async (req, res) => {
                             ),
                         },
                     });
+                    console.log('file.destinationId:', file.destinationId)
+                    console.log('updatedFile.destinationId:', updatedFile.destinationId)
+                    const {data, error} = await supabase.storage.from('folderOfFolders').move(file.destinationId, updatedFile.destinationId)
+                    if (!error) {
+                        console.log('data update', data)
+                    } else {
+                        console.error(error)
+                    }
                 }
             }
             if (childrenFolder.length === 0) {
@@ -374,12 +369,17 @@ async function deleteFolder(req, res) {
     async function deleteChildren(childrenFolder) {
         console.log("childrenFolder:", childrenFolder);
         if (childrenFolder.files.length !== 0) {
+
             for (const file of childrenFolder.files) {
                 const deletedFile = await prisma.files.delete({
                     where: {
                         id: file.id,
                     },
                 });
+            }
+            const {data, error} = await supabase.storage.from('folderOfFolders').remove(childrenFolder.files.map(file => file.destinationId))
+            if (error) {
+                console.error(error)
             }
         }
 
@@ -413,7 +413,7 @@ async function deleteFolder(req, res) {
         console.log("deletedAllChildrenFolder:", deletedAllChildrenFolder);
     }
     deleteChildren(folder);
-    fs.rmdirSync(path.join(__dirname, folder.destination), { recursive: true });
+    // fs.rmdirSync(path.join(__dirname, folder.destination), { recursive: true });
     res.redirect(parentFolder.folderUrl);
 }
 

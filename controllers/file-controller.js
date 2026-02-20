@@ -1,6 +1,7 @@
 const prisma = require("../lib/prisma")
 const path = require('node:path')
 const fs = require('node:fs')
+const { supabase } = require("../utlis/supabase")
 
 async function displayFileInfo(req, res) {
     const file = await prisma.files.findUnique({
@@ -13,9 +14,6 @@ async function displayFileInfo(req, res) {
             id: file.folderId
         }
     })
-    console.log('req.originalUrl.replace("/file", ).replace(/%(?:20)?/g, " " ):', req.originalUrl.replace("/file", ).replace(/%(?:20)?/g, ' '))
-    console.log('req.originalUrl:', req.originalUrl)
-    console.log('file:', file)
     res.render('displayFileInfo', {file, parentFolder})
 }
 
@@ -25,7 +23,11 @@ async function downloadFile(req, res) {
             fileUrl: req.originalUrl.replace('/file', '').replace('/download', '').replace(/%(?:20)?/g, ' ')
         }
     })
-    res.download(path.join(__dirname, file.destinationId), file.name)
+    console.log('file.destinationId:', file.destinationId)
+    const {data} = supabase.storage.from('folderOfFolders').getPublicUrl(file.destinationId, { download: true})
+    console.log('data:', data)
+    // res.download(data.publicUrl, file.name)
+    res.redirect('/file' + file.fileUrl)
 }
 
 

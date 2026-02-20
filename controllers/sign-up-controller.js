@@ -42,8 +42,8 @@ exports.signUpController = [
                 password: hash
             },
         })
-        const destination = `../../../uploaded-file/${userCreate.username}`
-        fs.mkdirSync(path.join(__dirname, destination))
+        const destination = `${userCreate.username}`
+        // fs.mkdirSync(path.join(__dirname, destination))
         const createFirstFolder = await prisma.folder.create({
             data : {
                 userId : userCreate.id,
