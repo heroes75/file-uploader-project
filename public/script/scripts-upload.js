@@ -1,3 +1,4 @@
+// import { supabase } from "../../utlis/supabase"
 
 const form = document.getElementById('form')
 const submit = document.getElementById('submit-file')
@@ -14,13 +15,19 @@ submit.addEventListener('click', (e) => {
     console.log('e of button:', e.target)
 })
 
-input.addEventListener('change', (e) => {
-    console.log('e of inout:', e.target.files)
+input.addEventListener('change', function (e) {
+console.log(this.files)
+    console.log('e of inout:', e.files)
 })
 
-function processSelectedFiles(fileInput) {
-  let files = fileInput.files[0];
-  console.log('files:', files)
-  return files
-}
-module.exports = processSelectedFiles
+
+// async function processSelectedFiles(fileInput) {
+//   let files = fileInput.files[0];
+//   const {data, error} = await supabase.storage.from('folderOfFolder').upload('home/1234.png', files)
+//   if (!error) {
+//     console.log(data)
+//   }
+//   console.log('files:', files)
+//   return files
+// }
+// module.exports = processSelectedFiles

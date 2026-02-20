@@ -16,7 +16,7 @@ const fileRouter = require('./routes/file.router')
 
 
 const app = express();
-const PORT = 3333;
+const PORT = 3000;
 
 const assetsPath = path.join(__dirname, 'public');
 app.use(express.static(assetsPath));
