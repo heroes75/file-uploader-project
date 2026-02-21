@@ -2,7 +2,6 @@ const passport = require('passport')
 const prisma = require('../lib/prisma');
 const LocalStrategy = require('passport-local').Strategy;
 const bcrypt = require('bcryptjs')
-console.log('LocalStrategy:', LocalStrategy)
 
 const verifyCallback = async (username, password, done) => {
     const user = await prisma.user.findFirst({
@@ -29,18 +28,16 @@ const verifyCallback = async (username, password, done) => {
 const strategy = new LocalStrategy(verifyCallback)
 passport.use(strategy)
 
-passport.serializeUser((user, done) => {
-    return done(null, user.id)
+passport.serializeUser((username, done) => {
+    return done(null, username.username)
 })
 
-passport.deserializeUser( async (userId, done) => {
+passport.deserializeUser( async (username, done) => {
     const getUserById = await prisma.user.findUnique({
         where: {
-            id: userId
+            username: username
         }
     })
     return done(null, getUserById)
 })
-
-
-
+ 

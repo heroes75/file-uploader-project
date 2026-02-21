@@ -26,27 +26,34 @@ async function downloadFile(req, res) {
     console.log('file.destinationId:', file.destinationId)
     const {data} = supabase.storage.from('folderOfFolders').getPublicUrl(file.destinationId, { download: true})
     console.log('data:', data)
-    // res.download(data.publicUrl, file.name)
-    res.redirect('/file' + file.fileUrl)
+    res.redirect(data.publicUrl)
 }
 
 
 async function deleteFile(req, res) {
     console.log('originalUrl:', req.originalUrl)
     const sanitizedUrl = req.originalUrl.replace('/file', '').replace('/delete', '').replace(/%(?:20)?/g, ' ')
-    const deletedFile = await prisma.files.delete({
+    const file = await prisma.files.findUnique({
         where: {
             fileUrl: sanitizedUrl
+        }
+    })
+    const deletedFile = await prisma.files.delete({
+        where: {
+            fileUrl: (() => {
+                const {data, error} = supabase.storage.from('folderOfFolders').remove(file.destinationId)
+                if (error) {
+                    console.error(error)
+                }
+                return file.fileUrl
+            })()
         }
     })
     const folder = await prisma.folder.findUnique({
         where: {
             id: deletedFile.folderId
         }
-        
     })
-    console.log('deletedFile:', deletedFile)
-    fs.rmSync(path.join(__dirname, deletedFile.destinationId))
     res.redirect(folder.folderUrl)
 }
 

@@ -3,7 +3,18 @@ const prisma = require("../lib/prisma");
 const path = require("node:path");
 const { matchedData, validationResult, body } = require("express-validator");
 const { supabase } = require("../utlis/supabase");
-const { REALTIME_PRESENCE_LISTEN_EVENTS } = require("@supabase/supabase-js");
+
+
+const validFile = body('filebackup')
+    .custom((value, {req}) => {
+        const fileSize = req.file.size;
+        const_45MB = 47185920
+        const isTooHeavy = (fileSize / _45MB) > _45MB
+        if (isTooHeavy) {
+            throw new Error('Too heavy')
+        }
+    }).withMessage('your must overflow 45MB')
+
 
 const validNameFolder = body("folderName")
     .custom(async (value, { req }) => {
@@ -59,10 +70,6 @@ const validUpdateFolder = body("name")
 
 
 async function displayDashboard(req, res) {
-    // const form = document.querySelector('#form')
-    // console.log('form:', form)
-    const pathIrl = path.join(__dirname, '../folderOfFolders')
-    console.log('pathIrl:', pathIrl)
     const folders = await prisma.folder.findFirst({
         where: {
             destination: `${req.user.username}`,
@@ -83,6 +90,8 @@ async function displayDashboard(req, res) {
 
 async function uploadFile(req, res, next) {
     // console.log('upload start..')
+    const errors = validationResult(req)
+
     const ext = '.' + req.file.mimetype.replace(/^([^\/]+)\//, "")
     const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
     req.file.name = req.file.originalname.replace(/[^\x00-\x7F]+/g, '') + "-" + uniqueSuffix + ext
