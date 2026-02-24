@@ -7,6 +7,7 @@ const { supabase } = require("../utlis/supabase");
 
 const validFile = body('filebackup')
     .custom((value, {req}) => {
+        console.log('fileSize:', fileSize)
         const fileSize = req.file.size;
         const_45MB = 47185920
         const isTooHeavy = (fileSize / _45MB) > _45MB
@@ -90,8 +91,9 @@ async function displayDashboard(req, res) {
 
 async function uploadFile(req, res, next) {
     // console.log('upload start..')
+    console.log('req:', req.files)
     const errors = validationResult(req)
-
+    
     const ext = '.' + req.file.mimetype.replace(/^([^\/]+)\//, "")
     const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
     req.file.name = req.file.originalname.replace(/[^\x00-\x7F]+/g, '') + "-" + uniqueSuffix + ext
@@ -106,6 +108,14 @@ async function uploadFile(req, res, next) {
             folderUrl: url,
         },
     });
+    const parentFolder = await prisma.folder.findUnique({
+        where: {
+            id: folder.parentId || ''
+        }
+    })
+    if (!errors.isEmpty()) {
+        res.render('displayFolder', {errors: errors.errors, folder: folder, parentFolder: parentFolder, files: folder.files,})
+    }
     console.log('folder:', folder)
     const createFile = await prisma.files.create({
         data: {
@@ -187,20 +197,22 @@ async function displayFolder(req, res) {
             files: true,
         },
     });
-    const parentFolder = await prisma.folder.findFirst({
-        where: {
-            id: folder.parentId,
-        },
-    });
+    console.log('folder:', folder)
+    console.log('folderurl:', req.originalUrl
+                .replace(/\/create/, "")
+                .replace(/$\//, "")
+                .replaceAll("%20", " "),)
+        const parentFolder = await prisma.folder.findFirst({
+            where: {
+                id: folder.parentId || '',
+            },
+        });
+    
     if (!folder) {
         res.status(404).send("<h1>this file or folder don't exist</h1>");
         return;
     }
-    res.render("displayFolder", {
-        folder: folder,
-        parentFolder: parentFolder,
-        files: folder.files,
-    });
+    res.render("displayFolder", { folder: folder, parentFolder: parentFolder, files: folder.files });
 }
 
 const displayCreateFolderPage = async (req, res) => {
@@ -437,4 +449,5 @@ module.exports = {
     deleteFolder,
     validNameFolder,
     validUpdateFolder,
+    validFile
 };
