@@ -17,7 +17,7 @@
     
     <%- include('partials/displaySubFolders', {folders: locals.folder.folders}) %>
     <%- include('partials/displayFiles', {files: locals.files}) %>
-    <%- include('partials/errors', {errors: locals.errors}) %>
+    <%- include('partials/errors.ejs', {errors: locals.errors}) %>
     <%- include('partials/uploadForm', {folderUrl: locals.folder.folderUrl}) %>
     <a href="<%= locals.folder.folderUrl %>/create">Create a sub folder</a>
 </body>

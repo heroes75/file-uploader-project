@@ -107,14 +107,21 @@ async function uploadFile(req, res, next) {
         where: {
             folderUrl: url,
         },
+        include: {
+            folders: true,
+            files: true
+        }
     });
     const parentFolder = await prisma.folder.findUnique({
         where: {
             id: folder.parentId || ''
         }
     })
+    console.log('folder:', folder)
+    console.log('parentFolder:', parentFolder)
     if (!errors.isEmpty()) {
-        res.render('displayFolder', {errors: errors.errors, folder: folder, parentFolder: parentFolder, files: folder.files,})
+        res.render('displayFolder', {folder: folder, parentFolder: parentFolder, files: folder.files, errors: errors.errors})
+        return
     }
     console.log('folder:', folder)
     const createFile = await prisma.files.create({
@@ -200,6 +207,7 @@ async function displayFolder(req, res) {
     console.log('folder:', folder)
     console.log('folderurl:', req.originalUrl
                 .replace(/\/create/, "")
+                .replace("/upload", "")
                 .replace(/$\//, "")
                 .replaceAll("%20", " "),)
         const parentFolder = await prisma.folder.findFirst({

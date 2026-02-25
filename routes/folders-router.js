@@ -58,7 +58,7 @@ const upload = multer({
 // uploadRouter.get('/:id', displayDashboard)
 // must add uploadFile function
 // uploadRouter.post('/:id/upload', upload.single('fileBackup'), uploadFile)
-uploadRouter.get("/:id/create", displayCreateFolderPage);
+// uploadRouter.get("/:id/create", displayCreateFolderPage);
 // uploadRouter.post('/:id/create',  createFolder)
 // uploadRouter.get(/(?:\/:id){2,}/,  createFolder)
 uploadRouter.get(/\/(.*)\/create$/, displayCreateFolderPage);
@@ -66,7 +66,7 @@ uploadRouter.post(/\/(.*)\/create$/, validNameFolder, createFolder);
 uploadRouter.get(/\/(.*)\/update$/, displayUpdateFolderPage);
 uploadRouter.post(/\/(.*)\/update$/, validUpdateFolder, updateFolder);
 uploadRouter.post(/\/(.*)\/delete$/, deleteFolder);
-uploadRouter.post(/\/(.*)\/upload$/, upload.single("fileBackup"), validFile, uploadFile);
 uploadRouter.get(/\/(.*)$/, displayFolder);
+uploadRouter.post(/\/(.*)$/, upload.single("fileBackup"), validFile, uploadFile);
 
 module.exports = uploadRouter;
