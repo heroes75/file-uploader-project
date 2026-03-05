@@ -8,6 +8,7 @@
     <script type="module" src="/script/scripts-upload.js" defer></script>
 </head>
 <body>
+    <%- include('partials/header') %>
     hello <%= locals.currentUser.username %>
     <%- include('partials/displaySubFolders', {folders: locals.folders}) %>
     <%- include('partials/displayFiles', {files: locals.files}) %>

@@ -41,3 +41,23 @@ passport.deserializeUser( async (username, done) => {
     return done(null, getUserById)
 })
  
+
+
+const isAuth = (req, res, next) => {
+    if (req.isAuthenticated()) {
+        next()
+        return
+    }
+    res.redirect('/login')
+}
+const isUnauth = (req ,res, next) => {
+    if (!req.isAuthenticated()) {
+        next()
+        return
+    }
+    res.redirect('/')
+}
+module.exports = {
+    isAuth,
+    isUnauth
+}

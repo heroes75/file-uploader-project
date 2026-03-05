@@ -3,9 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style-header.css">
     <title>HOME</title>
 </head>
 <body>
+    <%- include('partials/header') %>
     <h1>Hello <%= locals.currentUser?.username || 'World' %></h1>
     <% if (locals.currentUser) { %>
         <a href="/dashboard/<%=currentUser.username%>">Dashboard</a>

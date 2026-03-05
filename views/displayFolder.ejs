@@ -6,6 +6,7 @@
     <title><%= locals.folder.name || "Error" %></title>
 </head>
 <body>
+    <%- include('partials/header') %>
     <% if (locals.parentFolder) { %>
         <a href="<%= locals.parentFolder.folderUrl %>"><%= locals.parentFolder.name %></a>
     <% } %>

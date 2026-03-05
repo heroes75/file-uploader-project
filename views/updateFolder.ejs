@@ -6,6 +6,7 @@
     <title>Update <%= locals.folder.name %></title>
 </head>
 <body>
+    <%- include('partials/header') %>
     <form action="<%= locals.folder.folderUrl %>/update" method="post">
         <%- include('partials/errors', { errors: locals.errors}) %>
         <label for="name">Rename this folder</label>

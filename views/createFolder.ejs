@@ -6,6 +6,7 @@
     <title>Create a sub folder</title>
 </head>
 <body>
+    <%- include('partials/header') %>
     <form action="<%= locals.folderUrl %>/create" method="post">
         <%- include('partials/errors', {errors: locals.errors}) %>
         <label for="folderName"> Enter your folder name</label>

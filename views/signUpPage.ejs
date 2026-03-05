@@ -6,6 +6,7 @@
     <title>Sign Up</title>
 </head>
 <body>
+    <%- include('partials/header') %>
     <%- include('partials/errors', {errors: locals.errors}) %>
     <form action="/signup" method="post">
         <label for="username">Enter your username</label>

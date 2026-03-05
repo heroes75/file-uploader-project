@@ -5,16 +5,20 @@ const { matchedData, validationResult, body } = require("express-validator");
 const { supabase } = require("../utlis/supabase");
 
 
-const validFile = body('filebackup')
+const validFile = body('fileBackup')
     .custom((value, {req}) => {
-        console.log('fileSize:', fileSize)
+        console.log('value:', value)
         const fileSize = req.file.size;
-        const_45MB = 47185920
-        const isTooHeavy = (fileSize / _45MB) > _45MB
+        console.log('fileSize:', fileSize)
+        const _45MB = 47185920
+        console.log('_45MB:', _45MB)
+        const isTooHeavy = fileSize  > _45MB
+        console.log('isTooHeavy:', isTooHeavy)
         if (isTooHeavy) {
             throw new Error('Too heavy')
         }
-    }).withMessage('your must overflow 45MB')
+        return true
+    }).withMessage('your file must not overflow 45 MB')
 
 
 const validNameFolder = body("folderName")
