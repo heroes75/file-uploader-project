@@ -4,18 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style-header.css">
+    <link rel="stylesheet" href="style-home.css">
     <title>HOME</title>
 </head>
 <body>
     <%- include('partials/header') %>
-    <h1>Hello <%= locals.currentUser?.username || 'World' %></h1>
-    <% if (locals.currentUser) { %>
-        <a href="/dashboard/<%=currentUser.username%>">Dashboard</a>
-        <a href="/logout">LOGOUT</a>
-    <% } else { %>
-        <a href="/login">LOGIN</a>
-        <a href="/signup">Sign Up</a>
-    <% } %>
-    
+    <main>
+        <div class="main-container">
+            <h1>Welcome <%= locals.currentUser?.username || 'to our website' %></h1>
+            <% if (locals.currentUser) { %>
+                <a href="/dashboard/<%=currentUser.username%>">Dashboard</a>
+                <a href="/logout">LOGOUT</a>
+            <% } else { %>
+                <div class="presentation">
+                    <h3>upload your in in our securing database</h3>
+                    <p>with our highly secured our files is inviolable. be sure</p>
+                    <p><a href="/signup" class="join">Join our universe</a></p>
+                </div>
+                <p>if you already have an account, <a href="/login">click here</a></p>
+            <% } %>
+        </div>
+    </main>
 </body>
 </html>
