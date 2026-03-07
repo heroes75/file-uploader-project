@@ -135,6 +135,7 @@ async function uploadFile(req, res, next) {
             destinationId: folder.destination + '/' + name,
             name: name,
             originalName: file.originalname,
+            size: file.size
         },
     });
     console.log("createFile:", createFile);

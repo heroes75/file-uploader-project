@@ -32,6 +32,7 @@ model Files {
     name                String
     originalName        String
     fileUrl             String @unique
+    size                Int
     uploadedAt          DateTime @default(now())
     destinationFolder   Folder @relation(fields: [folderId], references: [id])
     folderId String

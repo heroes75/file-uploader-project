@@ -1,0 +1,39 @@
+.folder {
+    display: flex;
+    border: 2px double gray;
+    width: 100%;
+    padding: 10px 15px;
+    justify-content: space-between;
+    border-radius: 7px;
+    margin: 13px 0;
+}
+
+.folder .left  {
+    display: flex;
+    gap: 20px;
+}
+
+.folder button {
+    border-radius: 5px;
+    padding: 3px;
+    background-color: red;
+}
+
+.folder .left * {
+    font-size: 17px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.folder-svg {
+    width: 32px;
+    display: inline;
+}
+
+.folder > a {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 3px;
+}

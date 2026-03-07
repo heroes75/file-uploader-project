@@ -3,19 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style-header.css">
+    <link rel="stylesheet" href="style-login-page.css">
     <title>Sign Up</title>
 </head>
 <body>
     <%- include('partials/header') %>
-    <%- include('partials/errors', {errors: locals.errors}) %>
-    <form action="/signup" method="post">
-        <label for="username">Enter your username</label>
-        <input type="text" name="username" id="username">
-        <label for="password">Enter your password</label>
-        <input type="password" name="password" id="password">
-        <label for="confirmPassword">Confirm your password</label>
-        <input type="password" name="confirmPassword" id="confirmPassword">
-        <button type="submit">Create an account</button>
-    </form>
+    <main>
+        <%- include('partials/errors', {errors: locals.errors}) %>
+        <form action="/signup" method="post">
+            <h1>Join our amazing community now.</h1>
+            <label for="username">Enter your username</label>
+            <input type="text" name="username" id="username">
+            <label for="password">Enter your password</label>
+            <input type="password" name="password" id="password">
+            <label for="confirmPassword">Confirm your password</label>
+            <input type="password" name="confirmPassword" id="confirmPassword">
+            <button type="submit">Create an account</button>
+            <p>if you already have an account, <a href="/login">Login</a></p>
+        </form>
+    </main>
 </body>
 </html>

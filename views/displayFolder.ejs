@@ -3,23 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/style-header.css">
+    <link rel="stylesheet" href="/style-display-folder.css">
+    <link rel="stylesheet" href="/style-display-subfolder.css">
+    <link rel="stylesheet" href="/style-display-files.css">
     <title><%= locals.folder.name || "Error" %></title>
 </head>
 <body>
     <%- include('partials/header') %>
-    <% if (locals.parentFolder) { %>
-        <a href="<%= locals.parentFolder.folderUrl %>"><%= locals.parentFolder.name %></a>
-    <% } %>
-    <% if (!locals.parentFolder) { %>
-            <h1>Dashboard</h1>
-        <% } else { %>
-            <h1>folders of <%= locals.folder.name %></h1>
-    <% } %>
-    
-    <%- include('partials/displaySubFolders', {folders: locals.folder.folders}) %>
-    <%- include('partials/displayFiles', {files: locals.files}) %>
-    <%- include('partials/errors.ejs', {errors: locals.errors}) %>
-    <%- include('partials/uploadForm', {folderUrl: locals.folder.folderUrl}) %>
-    <a href="<%= locals.folder.folderUrl %>/create">Create a sub folder</a>
+    <main>
+        <% if (locals.parentFolder) { %>
+            <a href="<%= locals.parentFolder.folderUrl %>"><%= locals.parentFolder.name %></a>
+        <% } %>
+        <% if (!locals.parentFolder) { %>
+                <h1>Dashboard</h1>
+            <% } else { %>
+                <h1>folders of <%= locals.folder.name %></h1>
+        <% } %>
+        <%- include('partials/displaySubFolders', {folders: locals.folder.folders}) %>
+        <%- include('partials/displayFiles', {files: locals.files}) %>
+        <%- include('partials/errors.ejs', {errors: locals.errors}) %>
+        <%- include('partials/uploadForm', {folderUrl: locals.folder.folderUrl}) %>
+        <a href="<%= locals.folder.folderUrl %>/create">Create a sub folder</a>
+    </main>
 </body>
 </html>

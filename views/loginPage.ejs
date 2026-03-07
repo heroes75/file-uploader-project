@@ -3,16 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style-header.css">
+    <link rel="stylesheet" href="style-login-page.css">
     <title>Sign In</title>
 </head>
 <body>
     <%- include('partials/header') %>
-    <form action="/login" method="post">
-        <label for="username">Enter Your username</label>
-        <input type="text" id="username" name="username">
-        <label for="password">Enter your password</label>
-        <input type="password" name="password" id="oassword">
-        <button type="submit">Connect</button>
-    </form>
+    <main>
+        <form action="/login" method="post">
+            <h1>Welcome Back</h1>
+            <label for="username">Enter Your username</label>
+            <input type="text" id="username" name="username">
+            <label for="password">Enter your password</label>
+            <input type="password" name="password" id="oassword">
+            <button type="submit">Connect</button>
+            <p>if you don't have an account, <a href="/signup">Sign up</a></p>
+        </form>
+    </main>
 </body>
 </html>

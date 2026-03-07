@@ -13,8 +13,8 @@
         <div class="main-container">
             <h1>Welcome <%= locals.currentUser?.username || 'to our website' %></h1>
             <% if (locals.currentUser) { %>
-                <a href="/dashboard/<%=currentUser.username%>">Dashboard</a>
-                <a href="/logout">LOGOUT</a>
+                <p><a style="font-size: 25px;" href="/dashboard/<%=currentUser.username%>">Dashboard</a></p>
+                <p><a style="color: red; text-decoration: none; font-size: 20px;" href="/logout">LOGOUT</a></p>
             <% } else { %>
                 <div class="presentation">
                     <h3>upload your in in our securing database</h3>

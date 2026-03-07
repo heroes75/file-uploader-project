@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style-header.css">
     <title><%= file.name %></title>
 </head>
 <body>
@@ -11,16 +12,16 @@
         <a href="<%= parentFolder.folderUrl %>"><%= parentFolder.name %></a>
     </div>
     <div>
-        code:<%= file.name %>
+        code: <%= file.name %>
     </div>
     <div>
         name: <%= file.originalName %>
     </div>
     <div>
-        <%= file.size %>
+        <%= file.uploadedAt %>
     </div>
     <div>
-        <%= file.uploadedAt %>
+        Size: <%= file.size %>
     </div>
     <div>
         <form action="/file<%= file.fileUrl %>/download" method="post">

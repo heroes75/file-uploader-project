@@ -1,6 +1,16 @@
 <% if (locals.files) { %>
-    <% for( const file of files ) { %>
-        <div><a href="/file<%= file.fileUrl %>"><%= file.originalName.replace(/-.*/, '') %></a></div>
-        <form action="<%=  %>" method="post"></form>
-    <% } %>
+    <div class="files-container">
+        <% for( const file of files ) { %>
+            <div class="file">
+                <div><a href="/file<%= file.fileUrl %>"><%= file.originalName.replace(/-.*/, '') %></a></div>
+                <div class="size">
+                    <%- file.size / (1024 * 1024)  %>MB
+                </div>
+                <div class="update-delete">
+                    <a href="<%= file.fileUrl %>/update">rename</a>
+                    <form action="<%= file.fileUrl %>/delete" method="post"><button>delete</button></form>
+                </div>
+            </div>
+        <% } %>
+    </div>
 <% } %>
