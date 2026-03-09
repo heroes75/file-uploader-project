@@ -1,3 +1,49 @@
 body {
-    
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex-grow: 2;
+    display: flex;
+    flex-direction: column;
+    padding: 25px;
+}
+
+main a {
+    padding: 15px;
+    border: 2px double gray;
+    background-color: rgba(180, 180, 180, .2);
+    border-radius: 10px;
+}
+
+main > * {
+    margin: 10px;
+    font-size: 25px;
+    font-weight: 900;
+}
+
+div:nth-child(2) {
+    color: green;
+}
+
+div:nth-child(4) {
+    color: blue;
+}
+
+div:nth-child(5) {
+    color: red;
+}
+
+.buttons {
+    display: flex;
+    gap: 25px;
+}
+
+.buttons button {
+    padding: 13px;
+    display: flex;
+    align-items: center;
+    background-color: transparent;
+    cursor: pointer;
 }

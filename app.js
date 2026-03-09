@@ -14,6 +14,7 @@ const logoutRouter = require('./routes/logout-router')
 const uploadRouter = require('./routes/folders-router')
 const fileRouter = require('./routes/file.router')
 const { isAuth, isUnauth } = require('./config/passport')
+const shareRouter = require('./routes/share-router')
 
 
 const app = express();
@@ -55,6 +56,7 @@ app.use('/login', isUnauth, loginRouter)
 app.use('/logout', isAuth, logoutRouter)
 app.use('/dashboard', isAuth, uploadRouter)
 app.use('/file', isAuth, fileRouter)
+app.use('/share', shareRouter)
 
 app.listen(PORT, (err) => {
     if (err) {
