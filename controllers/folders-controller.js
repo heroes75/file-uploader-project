@@ -236,10 +236,10 @@ const displayCreateFolderPage = async (req, res) => {
         },
     });
     if (!folder) {
-        res.status(404).send("<h1>this file don't exist");
+        res.status(404).send("<h1>this file don't exist</h1>");
         return;
     }
-    res.render("createFolder", { folderUrl: folder.folderUrl });
+    res.render("createFolder", { folderUrl: folder.folderUrl, name: folder.name });
 };
 
 async function displayUpdateFolderPage(req, res) {

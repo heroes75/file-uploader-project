@@ -3,16 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style-header.css">
+    <link rel="stylesheet" href="/style-login-page.css">
+    <link rel="stylesheet" href="/style-header.css"> 
     <title>Update <%= locals.folder.name %></title>
 </head>
 <body>
     <%- include('partials/header') %>
-    <form action="<%= locals.folder.folderUrl %>/update" method="post">
-        <%- include('partials/errors', { errors: locals.errors}) %>
-        <label for="name">Rename this folder</label>
-        <input type="text" name="name" id="name" value="<%= locals.folder.name %>" required>
-        <button type="submit">Update this folder</button>
-    </form>
+    <main>
+        <form action="<%= locals.folder.folderUrl %>/update" method="post">
+            <%- include('partials/errors', { errors: locals.errors}) %>
+            <h3><a href="<%= folder.folderUrl %>"><%= folder.name %></a></h3>
+            <label for="name">Rename this folder</label>
+            <input type="text" name="name" id="name" value="<%= locals.folder.name %>" required>
+            <button type="submit">Update this folder</button>
+        </form>
+    </main>
 </body>
 </html>

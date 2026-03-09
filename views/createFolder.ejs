@@ -3,16 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style-header.css">
+    <link rel="stylesheet" href="/style-login-page.css">
+    <link rel="stylesheet" href="/style-header.css">
     <title>Create a sub folder</title>
 </head>
 <body>
     <%- include('partials/header') %>
-    <form action="<%= locals.folderUrl %>/create" method="post">
-        <%- include('partials/errors', {errors: locals.errors}) %>
-        <label for="folderName"> Enter your folder name</label>
-        <input type="text" name="folderName" id="folderName" required>
-        <button type="submit">Submit</button>
-    </form>
+    <main>
+        
+        <form action="<%= locals.folderUrl %>/create" method="post">
+            <h3><a href="<%=locals.folderUrl%>"><%= locals.name %></a></h3>
+            <%- include('partials/errors', {errors: locals.errors}) %>
+            <label for="folderName"> Enter your folder name</label>
+            <input type="text" name="folderName" id="folderName" required>
+            <button type="submit">Submit</button>
+        </form>
+    </main>
 </body>
 </html>

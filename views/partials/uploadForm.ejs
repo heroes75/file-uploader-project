@@ -5,6 +5,12 @@
     id="form"
 >
     <label for="fileBackup">Upload your file: </label>
-    <input id="input" type="file" name="fileBackup" id="fileBackup" onchange="processSelectedFiles(this)" required/>
-    <button id="submit-file" type="submit">Upload</button>
+    <input id="file" type="file" name="fileBackup" required/>
+    <button id="submit-file" type="submit">
+        <svg xmlns="http://www.w3.org/2000/svg" width="32px" height="32px" fill="currentColor" viewBox="0 0 24 24">
+            <title>upload</title>
+            <path d="M9,16V10H5L12,3L19,10H15V16H9M5,20V18H19V20H5Z" />
+        </svg>
+        <span>Upload</span>
+    </button>
 </form>

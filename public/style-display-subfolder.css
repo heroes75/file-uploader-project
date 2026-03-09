@@ -14,9 +14,9 @@
 }
 
 .folder button {
-    border-radius: 5px;
     padding: 3px;
-    background-color: red;
+    background-color: transparent;
+    border: 0;
 }
 
 .folder .left * {
