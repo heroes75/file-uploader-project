@@ -28,20 +28,20 @@ model User {
 }
 
 model Files {
-    id                  String @id @default(uuid())
-    name                String
-    originalName        String
-    fileUrl             String @unique
-    size                Int
-    uploadedAt          DateTime @default(now())
-    destinationFolder   Folder @relation(fields: [folderId], references: [id])
-    folderId String
-    destinationId       String
+    id                String   @id @default(uuid())
+    name              String
+    originalName      String
+    fileUrl           String   @unique
+    size              Int
+    uploadedAt        DateTime @default(now())
+    destinationFolder Folder   @relation(fields: [folderId], references: [id])
+    folderId          String
+    destinationId     String
 }
 
 model Folder {
     id          String   @id @default(uuid())
-    name        String   
+    name        String
     destination String   @unique
     folderUrl   String   @unique
     user        User     @relation(fields: [userId], references: [id])
@@ -50,4 +50,11 @@ model Folder {
     parentId    String?
     files       Files[]
     folders     Folder[] @relation("folderParent")
+}
+
+model ShareFolder {
+    id        String   @id @default(cuid())
+    shareUrl  String   @unique
+    createdAt DateTime @default(now())
+    duration  Int
 }

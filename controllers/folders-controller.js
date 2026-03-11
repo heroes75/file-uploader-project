@@ -131,7 +131,7 @@ async function uploadFile(req, res, next) {
     const createFile = await prisma.files.create({
         data: {
             folderId: folder.id,
-            fileUrl: url + name,
+            fileUrl: url + '/' + name,
             destinationId: folder.destination + '/' + name,
             name: name,
             originalName: file.originalname,

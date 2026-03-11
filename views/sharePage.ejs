@@ -3,9 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>share <%= locals.file.originalName %></title>
+    <link rel="stylesheet" href="/style-header.css">
+    <title>share <%= locals.file?.originalName || locals.folder.name  %></title>
 </head>
 <body>
-    <p>hello word</p>
+    <%- include('partials/header') %>
+    <main>
+        <form action="" method="post">
+            <label for="time">Enter the link duration</label>
+            <input type="number" name="time" id="time" min="1" required>
+            <button type="submit">Submit</button>
+            <output><%= locals.publicUrl %></output>
+            <% if (locals.publicUrl) { %>
+                    <input type="text" name="shareLink" id="shareLink" value="<%= locals.publicUrl %>">
+            <% } %>
+        </form>
+    </main>
 </body>
 </html>
