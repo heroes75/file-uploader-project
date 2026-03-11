@@ -50,21 +50,52 @@ async function shareFolder(req, res) {
     const url = req.originalUrl.replace('/folder', '');
     console.log(req.params)
     const {time} = req.body
+    const duration = +time * 60 * 1000;
     const folder = await prisma.folder.findUnique({
         where: {
             folderUrl: url.replace('/share', '')
+        },
+        include: {
+            folders: true,
         }
     })
     console.log('folder:', folder)
     const sharedFolder = await prisma.shareFolder.create({
         data: {
             shareUrl: url,
-            duration: +time * 60 * 1000,
+            duration
         }
     })
+    const shareChildrenFolder = async function (childrenFolder) {
+        if (childrenFolder.length === 0) {
+            return
+        }
+        for (const childFolder of childrenFolder) {
+            const subChildFolder = await prisma.folder.findUnique({
+                where: {
+                    id: childFolder.id
+                },
+                include: {
+                    folders: true
+                }
+            })
+            console.log('childFolder:', childFolder)
+            const shareChildFolder = await prisma.shareFolder.create({
+                data: {
+                    shareUrl: '/share' + childFolder.folderUrl,
+                    duration
+                }
+            })
+            console.log('subChildFolder:', subChildFolder)
+            shareChildrenFolder(subChildFolder.folders)
+        }
+    }
+    console.log('folder.folders:', folder.folders)
+    shareChildrenFolder(folder.folders)
     const sharedUrl = req.host + url
     res.render('sharePage', {publicUrl: sharedUrl, folder: folder})
 }
+
 
 async function displayShareFolder(req, res) {
     const folderUrl = '/' + req.params[0]

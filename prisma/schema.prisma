@@ -54,7 +54,7 @@ model Folder {
 
 model ShareFolder {
     id        String   @id @default(cuid())
-    shareUrl  String   @unique
+    shareUrl  String   
     createdAt DateTime @default(now())
     duration  Int
 }
