@@ -1,7 +1,7 @@
 <% if (locals.folders) { %>
         <% folders.forEach(folder => { %>
             <div class="folder">
-                <a style="font-size: 20px;" href="<%- folder.folderUrl %>">
+                <a style="font-size: 20px;" href="<%- !locals.isShare ? folder.folderUrl : '/share' + folder.folderUrl + '/' + locals.hash %>">
                     <svg class="folder-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
                         <title>folder-outline</title><path d="M20,18H4V8H20M20,6H12L10,4H4C2.89,4 2,4.89 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V8C22,6.89 21.1,6 20,6Z" />
                     </svg>

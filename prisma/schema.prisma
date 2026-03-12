@@ -28,33 +28,51 @@ model User {
 }
 
 model Files {
-    id                String   @id @default(uuid())
+    id                String      @id @default(uuid())
     name              String
     originalName      String
-    fileUrl           String   @unique
+    fileUrl           String      @unique
     size              Int
-    uploadedAt        DateTime @default(now())
-    destinationFolder Folder   @relation(fields: [folderId], references: [id])
+    uploadedAt        DateTime    @default(now())
+    destinationFolder Folder      @relation(fields: [folderId], references: [id])
     folderId          String
     destinationId     String
+    shareFiles        ShareFile[]
 }
 
 model Folder {
-    id          String   @id @default(uuid())
-    name        String
-    destination String   @unique
-    folderUrl   String   @unique
-    user        User     @relation(fields: [userId], references: [id])
-    userId      Int
-    parent      Folder?  @relation("folderParent", fields: [parentId], references: [id])
-    parentId    String?
-    files       Files[]
-    folders     Folder[] @relation("folderParent")
+    id           String        @id @default(uuid())
+    name         String
+    destination  String        @unique
+    folderUrl    String        @unique
+    user         User          @relation(fields: [userId], references: [id])
+    userId       Int
+    parent       Folder?       @relation("folderParent", fields: [parentId], references: [id])
+    parentId     String?
+    files        Files[]
+    folders      Folder[]      @relation("folderParent")
+    shareFolders ShareFolder[]
 }
 
 model ShareFolder {
     id        String   @id @default(cuid())
-    shareUrl  String   
+    name      String
+    shareUrl  String   @unique
     createdAt DateTime @default(now())
+    // parent    ShareFolder?  @relation("shareFolderParent", fields: [parentId], references: [id])
+    // parentId  String?
     duration  Int
+    folder    Folder   @relation(fields: [folderId], references: [id])
+    folderId  String
+    // folders   ShareFolder[] @relation("shareFolderParent")
+    // files     ShareFile[]
+}
+
+model ShareFile {
+    id           String   @id @default(cuid())
+    shareFileUrl String   @unique
+    createdAt    DateTime
+    duration     Int
+    file         Files    @relation(fields: [fileId], references: [id])
+    fileId       String
 }

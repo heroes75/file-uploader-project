@@ -7,6 +7,6 @@ shareRouter.get(/\/(.*)\/file$/, displaySharePage)
 shareRouter.get(/\/(.*)\/folder$/, displaySharePage)
 shareRouter.post(/\/(.*)\/folder$/, shareFolder)
 shareRouter.post(/\/(.*)\/file$/, shareFile)
-shareRouter.get(/\/(.*)/, displayShareFolder)
+shareRouter.get(/\/(.*)\/(?<hash>.*)$/, displayShareFolder)
 
 module.exports = shareRouter
