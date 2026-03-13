@@ -17,11 +17,11 @@
                 <a href="<%= !locals.isShare ? locals.parentFolder.folderUrl : locals.parentFolder.shareFolders[0].shareUrl %>"><%= locals.parentFolder.name %></a>
             <% } %>
             <% if (!locals.parentFolder) { %>
-                    <h1>Dashboard</h1>
+                    <h1><%= locals.isShare ? locals.folder.name : 'Dashboard' %></h1>
                 <% } else { %>
                     <h1>folders of <%= locals.folder.name %></h1>
             <% } %>
-            <% if (currentUser) { %>
+            <% if (!locals.isShare) { %>
                     <a href="<%= locals.folder.folderUrl %>/create">
                         <svg xmlns="http://www.w3.org/2000/svg" width="32px" height="32px" fill="currentColor" viewBox="0 0 24 24">
                             <title>folder-plus-outline</title>

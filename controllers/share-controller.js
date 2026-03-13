@@ -5,8 +5,7 @@ async function displaySharePage(req, res) {
     console.log("req:", req.host);
     const url = req.originalUrl
         .replace("%20", " ")
-        .replaceAll(/\/share|\/file|\/folder/g, "");
-    console.log("url:", url);
+        .replaceAll(/\/share|\/file$|\/folder$/g, "");
     if (req.originalUrl.match(/\/folder$/)) {
         const folder = await prisma.folder.findUnique({
             where: {
@@ -21,14 +20,13 @@ async function displaySharePage(req, res) {
             fileUrl: url,
         },
     });
-    console.log("file:", file);
     res.render("sharePage", { file });
 }
 
 async function shareFile(req, res) {
     const url = req.originalUrl
         .replace("%20", " ")
-        .replaceAll(/\/share\/dashboard|\/file/g, "");
+        .replaceAll(/^\/share\/dashboard|\/file$/g, "");
     console.log("req:", req.hostname);
     console.log("req.originalUrl:", req.originalUrl);
     console.log("url:", url);
@@ -49,12 +47,11 @@ async function shareFile(req, res) {
 }
 
 async function shareFolder(req, res) {
-    const url = req.originalUrl.replace("/folder", "");
+    const url = req.originalUrl.replace(/\/folder$/, "");
     console.log("req.params", req.params);
     const { time } = req.body;
     const duration = +time * 60 * 1000;
     const hash = crypto.randomUUID();
-    console.log("hash:", hash);
     const folder = await prisma.folder.findUnique({
         where: {
             folderUrl: url.replace("/share", ""),
