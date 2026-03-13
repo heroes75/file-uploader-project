@@ -58,10 +58,9 @@ model ShareFolder {
     id        String   @id @default(cuid())
     name      String
     shareUrl  String   @unique
-    createdAt DateTime @default(now())
+    expiredAt DateTime 
     // parent    ShareFolder?  @relation("shareFolderParent", fields: [parentId], references: [id])
     // parentId  String?
-    duration  Int
     folder    Folder   @relation(fields: [folderId], references: [id])
     folderId  String
     // folders   ShareFolder[] @relation("shareFolderParent")
@@ -71,8 +70,7 @@ model ShareFolder {
 model ShareFile {
     id           String   @id @default(cuid())
     shareFileUrl String   @unique
-    createdAt    DateTime
-    duration     Int
+    expiredAt    DateTime
     file         Files    @relation(fields: [fileId], references: [id])
     fileId       String
 }

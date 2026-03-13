@@ -36,6 +36,11 @@ async function deleteFile(req, res) {
     const file = await prisma.files.findUnique({
         where: {
             fileUrl: sanitizedUrl
+        },
+    })
+    const deleteSharedFiles = await prisma.shareFile.deleteMany({
+        where: {
+            fileId: file.id
         }
     })
     const deletedFile = await prisma.files.delete({

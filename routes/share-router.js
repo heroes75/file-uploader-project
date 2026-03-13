@@ -1,8 +1,9 @@
 const {Router} = require('express')
-const { displaySharePage, shareFile, shareFolder, displayShareFolder } = require('../controllers/share-controller')
+const { displaySharePage, shareFile, shareFolder, displayShareFolder, displayShareFile } = require('../controllers/share-controller')
 
 const shareRouter = Router()
 
+shareRouter.get(/\/(.*)\/(?<hash>.*)\/file$/, displayShareFile)
 shareRouter.get(/\/(.*)\/file$/, displaySharePage)
 shareRouter.get(/\/(.*)\/folder$/, displaySharePage)
 shareRouter.post(/\/(.*)\/folder$/, shareFolder)

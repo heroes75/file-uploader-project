@@ -65,10 +65,13 @@ async function shareFolder(req, res) {
         },
     });
     console.log("folder:", folder.name);
+    const createdAt = Date.now()
+    const expiredAt = new Date(createdAt + duration);
+    console.log('expiredAt:', expiredAt)
     const sharedFolder = await prisma.shareFolder.create({
         data: {
             shareUrl: url + "/" + hash,
-            duration,
+            expiredAt,
             folderId: folder.id,
             name: folder.name,
         },
@@ -78,10 +81,10 @@ async function shareFolder(req, res) {
             for (const childFile of childrenFile) {
                 const shareFile = await prisma.shareFile.create({
                     data: {
-                        shareFileUrl: "/share" + childFile.fileUrl + '/' + hash,
+                        shareFileUrl:
+                            "/share" + childFile.fileUrl + "/" + hash + "/file",
                         fileId: childFile.id,
-                        createdAt: sharedFolder.createdAt,
-                        duration: sharedFolder.duration,
+                        expiredAt: sharedFolder.expiredAt,
                     },
                 });
             }
@@ -103,7 +106,7 @@ async function shareFolder(req, res) {
             const shareChildFolder = await prisma.shareFolder.create({
                 data: {
                     shareUrl: "/share" + childFolder.folderUrl + "/" + hash,
-                    duration,
+                    expiredAt,
                     folderId: subChildFolder.id,
                     name: subChildFolder.name,
                 },
@@ -129,32 +132,100 @@ async function displayShareFolder(req, res) {
             shareUrl: url,
         },
     });
-    if (!shareFolder) {
-        res.json({ statusCode: "404" });
-    }
-    const date = new Date();
-    const parsedDate = Date.parse(sharedFolder.createdAt);
-    const limitDate = parsedDate + sharedFolder.duration;
-    if (date > limitDate) {
-        res.json({ statusCode: "400", message: "expired date" });
-        return;
-    }
     const folder = await prisma.folder.findUnique({
         where: {
             folderUrl,
         },
         include: {
             folders: true,
-            files: true,
+            files: {
+                include: {
+                    shareFiles: true,
+                },
+            },
+            shareFolders: true,
         },
     });
-    console.log("folder:", folder);
+    if (!sharedFolder || !folder) {
+        res.json({
+            statusCode: "404",
+            message: "folder not found in the system",
+        });
+        return;
+    }
+    const date = new Date();
+    if (date > sharedFolder.expiredAt) {
+        res.json({ statusCode: "400", message: "expired date" });
+        return;
+    }
+    
+    console.log("folder:", folder.files[0]);
+    folder.files = folder.files.filter(file => file.shareFiles.some(shareFile => shareFile.shareFileUrl.includes(hash)))
+    console.log('folder.files:', folder.files)
+    for (const file of folder.files) {
+        file.shareFiles = file.shareFiles.filter((shareFile) =>
+            shareFile.shareFileUrl.includes(hash),
+        );
+        console.log("file:", file.shareFiles);
+    }
+    const parentFolder = await prisma.folder.findUnique({
+        where: {
+            id: folder.parentId
+        },
+        include: {
+            shareFolders: true
+        }
+    })
+    const haveHash = parentFolder.shareFolders.some(folder => folder.shareUrl.includes(hash))
+    parentFolder.shareFolders  = parentFolder.shareFolders.filter(folder => folder.shareUrl.includes(hash)) 
     res.render("displayFolder", {
         folder: folder,
+        parentFolder: haveHash ? parentFolder : undefined,
         files: folder.files,
         isShare: true,
         hash,
     });
+}
+
+async function displayShareFile(req, res) {
+    const fileUrl = '/' + req.params[0];
+    const { hash } = req.params;
+    const sharedFile = await prisma.shareFile.findUnique({
+        where: {
+            shareFileUrl: req.originalUrl
+        }
+    })
+    if (!sharedFile) {
+        res.json({statusCode: 404, message: 'file not found in the system'})
+        return
+    }
+    const date = new Date()
+    if (date > sharedFile.expiredAt) {
+        res.json({statusCode: 400, message: 'expired date'})
+        return
+    }
+    const file = await prisma.files.findUnique({
+        where: {
+            fileUrl,
+        },
+        include: {
+            shareFiles: true,
+        },
+    });
+    file.shareFiles = file.shareFiles.filter((shareFile) =>
+        shareFile.shareFileUrl.includes(hash),
+    );
+    const parentFolder = await prisma.folder.findUnique({
+        where: {
+            id: file.folderId
+        },
+        include: {
+            shareFolders: true
+        }
+    })
+    parentFolder.shareFolders = parentFolder.shareFolders.filter(shareFolder => shareFolder.shareUrl.includes(hash))
+    console.log("file:", file.shareFiles);
+    res.render("displayFileInfo", { file, parentFolder, isShare: true });
 }
 
 module.exports = {
@@ -162,4 +233,5 @@ module.exports = {
     shareFile,
     shareFolder,
     displayShareFolder,
+    displayShareFile,
 };

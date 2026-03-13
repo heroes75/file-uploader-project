@@ -15,7 +15,7 @@
             <button type="submit">Submit</button>
             <output><%= locals.publicUrl %></output>
             <% if (locals.publicUrl) { %>
-                    <input type="text" name="shareLink" id="shareLink" value="<%= locals.publicUrl %>">
+                    <input type="text" name="shareLink" id="shareLink" value="<%= locals.publicUrl%>" readonly>
             <% } %>
         </form>
     </main>

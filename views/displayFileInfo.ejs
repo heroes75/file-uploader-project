@@ -11,7 +11,7 @@
     <%- include('partials/header') %>
     <main>
         <div>
-            <a href="<%= parentFolder.folderUrl %>"><%= parentFolder.name %></a>
+            <a href="<%= locals.isShare ? parentFolder.shareFolders[0].shareUrl : parentFolder.folderUrl %>"><%= parentFolder.name %></a>
         </div>
         <div>
             code: <%= file.name %>
@@ -37,20 +37,23 @@
                     </button>
                 </form>
             </div>
-            <div>
-                <button><a href="/share<%= file.fileUrl %>/file">Share</a></button>
-            </div>
-            <div>
-                <form action="/file<%= file.fileUrl %>/delete" method="post">
-                    <button type="submit">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="25px" height="25px" fill="red" viewBox="0 0 24 24">
-                            <title>trash-can</title>
-                            <path d="M9,3V4H4V6H5V19A2,2 0 0,0 7,21H17A2,2 0 0,0 19,19V6H20V4H15V3H9M9,8H11V17H9V8M13,8H15V17H13V8Z" />
-                        </svg>
-                        <span>Delete</span>
-                    </button>
-                </form>
-            </div>
+            <% if (!locals.isShare) { %>
+                    <div>
+                        <button><a href="/share<%= file.fileUrl %>/file">Share</a></button>
+                    </div>
+                    <div>
+                        <form action="/file<%= file.fileUrl %>/delete" method="post">
+                            <button type="submit">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="25px" height="25px" fill="red" viewBox="0 0 24 24">
+                                    <title>trash-can</title>
+                                    <path d="M9,3V4H4V6H5V19A2,2 0 0,0 7,21H17A2,2 0 0,0 19,19V6H20V4H15V3H9M9,8H11V17H9V8M13,8H15V17H13V8Z" />
+                                </svg>
+                                <span>Delete</span>
+                            </button>
+                        </form>
+                    </div>
+            <% } %>
+            
         </div>
     </main>
 </body>

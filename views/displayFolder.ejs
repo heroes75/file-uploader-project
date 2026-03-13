@@ -14,7 +14,7 @@
     <main>
         <div class="head">
             <% if (locals.parentFolder) { %>
-                <a href="<%= locals.parentFolder.folderUrl %>"><%= locals.parentFolder.name %></a>
+                <a href="<%= !locals.isShare ? locals.parentFolder.folderUrl : locals.parentFolder.shareFolders[0].shareUrl %>"><%= locals.parentFolder.name %></a>
             <% } %>
             <% if (!locals.parentFolder) { %>
                     <h1>Dashboard</h1>
