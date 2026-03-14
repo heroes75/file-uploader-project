@@ -1,9 +1,8 @@
 function logoutController(req, res) {
-    req.logout((err) => {
-        console.error(err)
-
-    })
-    res.redirect('/')
+  req.logout((err) => {
+    console.error(err);
+  });
+  res.redirect("/");
 }
 
-module.exports = logoutController
+module.exports = logoutController;

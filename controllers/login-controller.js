@@ -1,6 +1,6 @@
 function displayLoginPage(req, res) {
-    res.render('loginPage')
+  res.render("loginPage");
 }
 module.exports = {
-    displayLoginPage
-}
+  displayLoginPage,
+};

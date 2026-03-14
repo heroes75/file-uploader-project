@@ -1,10 +1,16 @@
-const {Router} = require('express')
-const { displayLoginPage } = require('../controllers/login-controller')
-const passport = require('passport')
+const { Router } = require("express");
+const { displayLoginPage } = require("../controllers/login-controller");
+const passport = require("passport");
 
-const loginRouter = Router()
+const loginRouter = Router();
 
-loginRouter.get('/', displayLoginPage)
-loginRouter.post('/', passport.authenticate('local', { failureRedirect: '/login',  successRedirect: '/'}))
+loginRouter.get("/", displayLoginPage);
+loginRouter.post(
+  "/",
+  passport.authenticate("local", {
+    failureRedirect: "/login",
+    successRedirect: "/",
+  }),
+);
 
-module.exports = loginRouter
+module.exports = loginRouter;

@@ -27,7 +27,12 @@
         </div>
         <div class="buttons">
             <div>
-                <form action="/file<%= file.fileUrl %>/download" method="post">
+                <% if (!locals.isShare) { %>
+                        <form action="/file<%= file.fileUrl %>/download" method="post">
+                    <% } else { %>
+                        <form action="<%= file.shareFiles[0].shareFileUrl %>/download" method="post">
+                <% } %>
+                
                     <button type="submit">
                         <svg xmlns="http://www.w3.org/2000/svg" width="25px" height="25px" viewBox="0 0 24 24">
                             <title>download</title>
@@ -39,7 +44,18 @@
             </div>
             <% if (!locals.isShare) { %>
                     <div>
-                        <button><a href="/share<%= file.fileUrl %>/file">Share</a></button>
+                        <button>
+                            <svg viewBox="0 0 24 24" width="25" height="25" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round" class="css-i6dzq1">
+                                <circle cx="18" cy="5" r="3"></circle>
+                                <circle cx="6" cy="12" r="3"></circle>
+                                <circle cx="18" cy="19" r="3"></circle>
+                                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                            </svg>
+                            <a id="share-link" href="/share<%= file.fileUrl %>/share-file">
+                                Share
+                            </a>
+                        </button>
                     </div>
                     <div>
                         <form action="/file<%= file.fileUrl %>/delete" method="post">

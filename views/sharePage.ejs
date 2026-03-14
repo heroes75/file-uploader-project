@@ -4,16 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/style-header.css">
+    <link rel="stylesheet" href="/style-login-page.css">
     <title>share <%= locals.file?.originalName || locals.folder.name  %></title>
 </head>
 <body>
     <%- include('partials/header') %>
     <main>
+
         <form action="" method="post">
-            <label for="time">Enter the link duration</label>
+            <h3><a href="<%= locals.folder?.folderUrl || '/file' + locals.file?.fileUrl %>"><%= locals.file?.originalName.slice(0, 7) || locals.folder.name %></a></h3>
+            <label for="time">Enter the link duration( in minutes ):</label>
             <input type="number" name="time" id="time" min="1" required>
             <button type="submit">Submit</button>
-            <output><%= locals.publicUrl %></output>
             <% if (locals.publicUrl) { %>
                     <input type="text" name="shareLink" id="shareLink" value="<%= locals.publicUrl%>" readonly>
             <% } %>
