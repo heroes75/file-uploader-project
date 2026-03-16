@@ -1,0 +1,76 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Session {
+  id        String   @id
+  sid       String   @unique
+  data      String   @db.Text
+  expiresAt DateTime
+}
+
+model User {
+  id       Int      @id @default(autoincrement())
+  username String   @unique @db.VarChar(255)
+  password String   @db.VarChar(255)
+  folders  Folder[]
+}
+
+model Files {
+  id                String      @id @default(uuid())
+  name              String
+  originalName      String
+  fileUrl           String      @unique
+  size              Int
+  uploadedAt        DateTime    @default(now())
+  destinationFolder Folder      @relation(fields: [folderId], references: [id])
+  folderId          String
+  destinationId     String
+  shareFiles        ShareFile[]
+}
+
+model Folder {
+  id           String        @id @default(uuid())
+  name         String
+  destination  String        @unique
+  folderUrl    String        @unique
+  user         User          @relation(fields: [userId], references: [id])
+  userId       Int
+  parent       Folder?       @relation("folderParent", fields: [parentId], references: [id])
+  parentId     String?
+  files        Files[]
+  folders      Folder[]      @relation("folderParent")
+  shareFolders ShareFolder[]
+}
+
+model ShareFolder {
+  id        String   @id @default(cuid())
+  name      String
+  shareUrl  String   @unique
+  expiredAt DateTime
+  // parent    ShareFolder?  @relation("shareFolderParent", fields: [parentId], references: [id])
+  // parentId  String?
+  folder    Folder   @relation(fields: [folderId], references: [id])
+  folderId  String
+  // folders   ShareFolder[] @relation("shareFolderParent")
+  // files     ShareFile[]
+}
+
+model ShareFile {
+  id           String   @id @default(cuid())
+  shareFileUrl String   @unique
+  expiredAt    DateTime
+  file         Files    @relation(fields: [fileId], references: [id])
+  fileId       String
+}
