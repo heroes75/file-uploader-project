@@ -1,8 +1,8 @@
 const { Router } = require("express");
 const {
-  displayFileInfo,
-  downloadFile,
-  deleteFile,
+    displayFileInfo,
+    downloadFile,
+    deleteFile,
 } = require("../controllers/file-controller");
 
 const fileRouter = Router();

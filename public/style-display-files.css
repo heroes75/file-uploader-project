@@ -1,23 +1,23 @@
 .file {
-  display: flex;
-  justify-content: space-between;
-  padding: 11px;
-  border: 3px gray solid;
-  margin: 15px auto;
-  border-radius: 7px;
+    display: flex;
+    justify-content: space-between;
+    padding: 11px;
+    border: 3px gray solid;
+    margin: 15px auto;
+    border-radius: 7px;
 }
 
 .file-name {
-  font-size: 18px;
-  display: flex;
-  align-items: center;
-  gap: 5px;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
 }
 
 .size,
 .date {
-  font-size: 22px;
-  font-weight: 800;
+    font-size: 22px;
+    font-weight: 800;
 }
 
 /* .uploadedAt {

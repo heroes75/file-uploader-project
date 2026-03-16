@@ -1,11 +1,11 @@
 const { Router } = require("express");
 const {
-  displaySharePage,
-  shareFile,
-  shareFolder,
-  displayShareFolder,
-  displayShareFile,
-  downloadSharedFile,
+    displaySharePage,
+    shareFile,
+    shareFolder,
+    displayShareFolder,
+    displayShareFile,
+    downloadSharedFile,
 } = require("../controllers/share-controller");
 
 const shareRouter = Router();

@@ -6,11 +6,11 @@ const loginRouter = Router();
 
 loginRouter.get("/", displayLoginPage);
 loginRouter.post(
-  "/",
-  passport.authenticate("local", {
-    failureRedirect: "/login",
-    successRedirect: "/",
-  }),
+    "/",
+    passport.authenticate("local", {
+        failureRedirect: "/login",
+        successRedirect: "/",
+    }),
 );
 
 module.exports = loginRouter;

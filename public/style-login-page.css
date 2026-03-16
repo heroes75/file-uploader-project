@@ -1,47 +1,47 @@
 body {
-  display: flex;
-  flex-direction: column;
+    display: flex;
+    flex-direction: column;
 }
 
 main {
-  flex-grow: 2;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+    flex-grow: 2;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 form {
-  display: flex;
-  flex-direction: column;
-  border: 3px dashed gray;
-  padding: 30px;
+    display: flex;
+    flex-direction: column;
+    border: 3px dashed gray;
+    padding: 30px;
 }
 
 label {
-  font-size: 25px;
-  margin: 5px 0;
+    font-size: 25px;
+    margin: 5px 0;
 }
 
 input {
-  width: 100%;
-  font-size: 32px;
-  padding: 0.3rem 0.1rem;
+    width: 100%;
+    font-size: 32px;
+    padding: 0.3rem 0.1rem;
 }
 
 button {
-  margin: 15px;
-  align-self: center;
-  padding: 11px 7px;
-  font-size: 22px;
-  border-radius: 0.3rem;
-  background-color: transparent;
+    margin: 15px;
+    align-self: center;
+    padding: 11px 7px;
+    font-size: 22px;
+    border-radius: 0.3rem;
+    background-color: transparent;
 }
 
 h3 {
-  text-align: center;
+    text-align: center;
 }
 
 p {
-  text-align: center;
-  font-size: 14px;
+    text-align: center;
+    font-size: 14px;
 }
