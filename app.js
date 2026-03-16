@@ -14,6 +14,9 @@ const uploadRouter = require("./routes/folders-router");
 const fileRouter = require("./routes/file.router");
 const { isAuth, isUnauth } = require("./config/passport");
 const shareRouter = require("./routes/share-router");
+const {inject} = require('@vercel/analytics')
+
+inject()
 
 const app = express();
 const PORT = 3000;
